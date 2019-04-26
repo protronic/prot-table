@@ -1,18 +1,63 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <prot-vue-table :table_data="live_data"></prot-vue-table>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import protVueTable from "./components/Table.vue";
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
-  }
+    protVueTable
+  },
+  mounted: function(){
+    this.getData();
+  },
+  data: function(){
+    return {
+      table_data: []
+    };
+  },
+  props: {
+    data_url: String,
+    data: Array,
+  },
+  computed: {
+    live_data: function(){
+      if(this.data){
+        return this.data;
+      }
+      else{
+        console.log({data_given: this.table_data})
+        return this.table_data;
+      }
+      
+    }
+  },
+  methods: {
+    getData(){
+      if(this.data_url) 
+        fetch(this.data_url)
+          .then( response => {
+            if(response.ok) {
+              console.log(response);
+              return response.json();
+            }
+            else 
+              throw `Got response ${response.status} from ${this.data_url}.`
+          })
+          .then( data => {
+            this.table_data = data;
+            console.log(data)
+          })
+          .catch( error => {
+            console.error(error);
+          });
+    }
+  },
 }
 </script>
 
