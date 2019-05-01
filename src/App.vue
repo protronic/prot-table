@@ -1,12 +1,19 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <prot-vue-table :table_data="live_data"></prot-vue-table>
+    <prot-vue-table :height="transform_options.height" :table_data="live_data"></prot-vue-table>
+    <img alt="Vue logo" src="./assets/logo.png">
+    <br>
+    <img alt="Vue logo" src="./assets/logo.png">
+    <br>
+    <img alt="Vue logo" src="./assets/logo.png">
+    <br>
   </div>
 </template>
 
 <script>
 import protVueTable from "./components/Table.vue";
+import console from 'core-js';
 
 export default {
   name: 'app',
@@ -24,14 +31,18 @@ export default {
   props: {
     data_url: String,
     data: Array,
+    options: [Object, String],
   },
   computed: {
+    transform_options: function(){
+      return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
+    },
     live_data: function(){
       if(this.data){
         return this.data;
       }
       else{
-        console.log({data_given: this.table_data})
+        // console.log({data_given: this.table_data})
         return this.table_data;
       }
       
@@ -43,7 +54,6 @@ export default {
         fetch(this.data_url)
           .then( response => {
             if(response.ok) {
-              console.log(response);
               return response.json();
             }
             else 
@@ -51,7 +61,6 @@ export default {
           })
           .then( data => {
             this.table_data = data;
-            console.log(data)
           })
           .catch( error => {
             console.error(error);
@@ -62,6 +71,7 @@ export default {
 </script>
 
 <style>
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -70,4 +80,10 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+/* Variable Definition */
+#app {
+  
+}
 </style>
+ 
