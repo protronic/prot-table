@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <prot-vue-table :height="transform_options.height" :table_data="live_data"></prot-vue-table>
+    <prot-vue-table></prot-vue-table>
     <img alt="Vue logo" src="./assets/logo.png">
     <br>
     <img alt="Vue logo" src="./assets/logo.png">
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import store from "./store/index";
 import protVueTable from "./components/Table.vue";
 import console from 'core-js';
 
@@ -20,70 +21,132 @@ export default {
   components: {
     protVueTable
   },
+  store: store,
   mounted: function(){
-    this.getData();
-  },
-  data: function(){
-    return {
-      table_data: []
-    };
+    this.$store.dispatch('fetch_table_data', this.data_url);
+    this.$store.commit('override_table_option', this.transform_options);
   },
   props: {
+    /**
+     * Url where the data can be fetched from. Has to be a json file and formatted by row. 
+     * example: 
+     *      [
+              {
+                "_id": "5bbd026039520dabb1a14e06",
+                "index": 0,
+                "isActive": false,
+                "first": "Ruby",
+                "last": "Joyce",
+                "company": "INJOY",
+                "address": "224 Jefferson Street, Talpa, New Mexico, 9637"
+              },
+              {
+                "_id": "5bbd026056e4b8e1a7da0bdd",
+                "index": 1,
+                "isActive": false,
+                "first": "Ann",
+                "last": "Griffith",
+                "company": "INJOY",
+                "phone": "+1 (828) 486-2051",
+                "address": "739 Lott Place, Carrizo, Minnesota, 7189"
+              }
+            ]
+     * would translate to 2 rows and 8 columns.
+     */
     data_url: String,
-    data: Array,
+
+    /** 
+     * options can either be an Object or a json string with the following propertys:
+     * - height?: [String, Number] - can be strings like ['1em', '2px', 'auto', ...] or a number. If number, px is assumed.
+     * TODO implement: - sortability?: Object - object where the keys are the header keys and the value is one of ['abc', '123', 'auto', function compareFn(a, b){...}]. 
+          Where auto means I'm trying to assume what type it is (maybe slow) and 
+          CompareFn defines a custom sort order where a and b are two values and the function describes how to sort them.
+     * TODO implement: - tableStyles?: Object - styles that apply to the whole table. In object notation. exmpl.: {'border': '1px solid black', 'border-radius': '5px'}
+     * TODO implement: - headerStyles?: Object - like tablestyles but applys only to header fields.
+     * TODO implement: - bodyStyles?: Object - like tablestyles and headerStyles but applys only to body fields.
+     * TODO implement: - rowStyles?: Object - styles that apply only to specific rows. keys are the header fields and values are style objects like in tableStyles.
+     * TODO implement: - colStyles?: Array - an array of objects containing the following keys:
+          - check_column: function(colValues, colIndex, vuexState){...}: Function - a function, deciding if a column applys for this style. Should only return one of [true, false].
+          - styles: Object - style Object that applys only to columns where checkColumn returned true.
+     * TODO implement: - formatter?: Object - keys are the header keys. value is a function in the form: function(value, rowIndex, vuexState){...} that gets called for
+          every body field in the specified (key) column. Can be used for display format changes or calculations on the table data.
+     * TODO implement: - cssVariables?: Object - css variables can, if needed, be overridden. Pass an Object with the variable names as keys and desired style as value.
+          css Variables should be overridden by the defined styles (tableStyles, headerStyles, ...) because they are supposed to be inline. So for small theme changes use 
+          css Variables and for deeper changes the style Objects.
+          Defined Variables with defaults after colon and usage above:
+          
+          Backgrounds:
+          --header-background: #f2f2f2;
+          --body-even-background: #ffffff;
+          --body-odd-background: #f2f2f2;
+
+          Color:
+          --table-font-color: #2c3e50;
+          --header-font-color: #2c3e50;
+          --body-even-font-color: #2c3e50;
+          --body-odd-font-color: #2c3e50;
+
+          Borders:
+          --table-border: 1px solid lightgray;
+          --header-field-border: 1px solid lightgray;
+          --body-field-border: 1px solid lightgray;
+
+          Font-Family:
+          --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
+
+
+          format example: 
+          {
+            "--table-border": "1px solid black",
+            "--header-field-border": "1px solid black",
+          }
+     * TODO maybe: - headerDef?: Object - could be an Object describing header keys. Right now headers are extracted from data.
+    */
     options: [Object, String],
   },
   computed: {
     transform_options: function(){
       return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
-    },
-    live_data: function(){
-      if(this.data){
-        return this.data;
-      }
-      else{
-        // console.log({data_given: this.table_data})
-        return this.table_data;
-      }
-      
     }
   },
   methods: {
-    getData(){
-      if(this.data_url) 
-        fetch(this.data_url)
-          .then( response => {
-            if(response.ok) {
-              return response.json();
-            }
-            else 
-              throw `Got response ${response.status} from ${this.data_url}.`
-          })
-          .then( data => {
-            this.table_data = data;
-          })
-          .catch( error => {
-            console.error(error);
-          });
-    }
+
   },
 }
 </script>
 
 <style>
+/* Variable Definitions */
+#app {
+  /* Backgrounds: */
+  --header-background: #f2f2f2;
+  --body-even-background: #ffffff;
+  --body-odd-background: #f2f2f2;
+
+  /* Color: */
+  --table-font-color: #2c3e50;
+  --header-font-color: #2c3e50;
+  --body-even-font-color: #2c3e50;
+  --body-odd-font-color: #2c3e50;
+
+  /* Border: */
+  --table-border: 1px solid lightgray;
+  --header-field-border: 1px solid lightgray;
+  --body-field-border: 1px solid lightgray;
+
+  /* Font-Family: */
+  --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
+  
+}
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: var(--table-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: var(--table-font-color);
+  margin: 10px;
 }
 
-/* Variable Definition */
-#app {
-  
-}
 </style>
  

@@ -4,8 +4,8 @@
     ref="prot_table"
     :style="{
       'grid-template-rows': 'repeat(' + (table_data.length + 1) + ', auto)', 
-      'height': typeof height === 'number' ? height + 'px' : height,
-      'overflow-y': height === 'auto' || height === undefined ? 'auto' : 'scroll',
+      'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
+      'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
     }"
   >
     <div 
@@ -20,7 +20,7 @@
       <div 
         v-for="(row, j) in table_data" 
         :key="'row' + j + 'col' + i" 
-        :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i]"
+        :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
         :style="{'grid-row': j + 2}"
         v-html="row[col]"
       ></div>
@@ -36,15 +36,14 @@ export default {
       // header_fields: [],
     };
   },
-  props: {
-    table_data: Array,
-    height: [Number, String],
-  },
   computed: {
-    show_scrollbar_y: function(){
-           
+    table_data(){
+      return this.$store.state.originalData;
     },
-    live_header_fields: function(){
+    table_options(){
+      return this.$store.state.tableOptions;
+    },
+    live_header_fields(){
       let header_fields = this.table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
         for (let i in current){
           if (!collector.includes(current[i])) 
@@ -72,23 +71,37 @@ export default {
   grid-template-rows: auto;
   overflow-x: auto;
   position: relative;
-  border: 1px solid lightgray;
-  box-sizing: border-box;
-  
-}
-
-.header_field, .body_field {
-  border: 0.4px solid lightgray;
-  box-sizing: border-box;
-  padding: 5px;
+  border: var(--table-border);
+  box-sizing: border-box;  
 }
 
 .header_field{
   grid-row: 1;
   position: sticky;
-  background: white;
   top: 0px;
   left: 0px;
+  background: var(--header-background);
+  color: var(--header-font-color);
+  border: var(--header-field-border);
+}
+
+.body_field {
+  border: var(--body-field-border);
+}
+
+.body_field.even_row {
+  background: var(--body-even-background);
+  color: var(--body-even-font-color);
+}
+
+.body_field.odd_row {
+  background: var(--body-odd-background);
+  color: var(--body-odd-font-color);
+}
+
+.header_field, .body_field {
+  box-sizing: border-box;
+  padding: 5px;
 }
 
 </style>
