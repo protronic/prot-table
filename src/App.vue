@@ -23,7 +23,7 @@ export default {
   },
   store: store,
   mounted: function(){
-    this.$store.dispatch('fetch_table_data', this.data_url);
+    this.$store.dispatch('fetch_table_data', this.data_url ? this.data_url : 'data.json'); // data.json for normal build. 
     this.$store.commit('override_table_option', this.transform_options);
   },
   props: {
@@ -59,7 +59,7 @@ export default {
      * options can either be an Object or a json string with the following propertys:
      * - height?: [String, Number] - can be strings like ['1em', '2px', 'auto', ...] or a number. If number, px is assumed.
      * TODO implement: - sortability?: Object - object where the keys are the header keys and the value is one of ['abc', '123', 'auto', function compareFn(a, b){...}]. 
-          Where auto means I'm trying to assume what type it is (maybe slow) and 
+          Where auto means I'm trying to assume what type it is (maybe slow, but the default option, either number (123) or letter (abc) sorted) and 
           CompareFn defines a custom sort order where a and b are two values and the function describes how to sort them.
      * TODO implement: - tableStyles?: Object - styles that apply to the whole table. In object notation. exmpl.: {'border': '1px solid black', 'border-radius': '5px'}
      * TODO implement: - headerStyles?: Object - like tablestyles but applys only to header fields.
@@ -101,6 +101,7 @@ export default {
             "--header-field-border": "1px solid black",
           }
      * TODO maybe: - headerDef?: Object - could be an Object describing header keys. Right now headers are extracted from data.
+     * TODO maybe: - dontShowCols?: Array - an Array of header fields, is hidden by default.
     */
     options: [Object, String],
   },

@@ -9,13 +9,14 @@
     }"
   >
     <div 
-      v-for="(key, i) in live_header_fields" 
+      v-for="(key, i) in header_fields" 
       :class="['header_field', 'header_col_' + i]" 
       :key="key" 
+      @click="sortClick($event, key)"
       v-html="key"
     ></div>
     <template 
-      v-for="(col, i) in live_header_fields"
+      v-for="(col, i) in header_fields"
     >
       <div 
         v-for="(row, j) in table_data" 
@@ -38,27 +39,28 @@ export default {
   },
   computed: {
     table_data(){
-      return this.$store.state.originalData;
+      return this.$store.state.sortedData.data;
     },
     table_options(){
       return this.$store.state.tableOptions;
     },
-    live_header_fields(){
-      let header_fields = this.table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
-        for (let i in current){
-          if (!collector.includes(current[i])) 
-            collector.push(current[i])
-        }
-        
-        return collector;
-      }
-      , []);
-
-      // console.log({data: this.table_data, header: this.header_fields});
-      return header_fields;
+    header_fields(){
+      console.log(this.sortability)
+      return this.$store.getters.get_header_list;
     },
+    sortability(){
+      return this.$store.getters.get_sortability;
+    }
+  },
+  methods: {
+    sortClick(event, header_key){
+      console.log({ev: event, he: header_key});
+      this.$store.dispatch('sort_action', header_key);
+      setTimeout( () => {
+        console.log(this.$store.state.sortedData);
+      }, 1000) 
+    }
   }
-
 }
 </script>
 
