@@ -1,13 +1,7 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
+  <div id="app" ref="app">
     <prot-vue-table></prot-vue-table>
-    <img alt="Vue logo" src="./assets/logo.png">
-    <br>
-    <img alt="Vue logo" src="./assets/logo.png">
-    <br>
-    <img alt="Vue logo" src="./assets/logo.png">
-    <br>
+
   </div>
 </template>
 
@@ -57,20 +51,22 @@ export default {
 
     /** 
      * options can either be an Object or a json string with the following propertys:
-     * - height?: [String, Number] - can be strings like ['1em', '2px', 'auto', ...] or a number. If number, px is assumed.
-     * TODO implement: - sortability?: Object - object where the keys are the header keys and the value is one of ['abc', '123', 'auto', function compareFn(a, b){...}]. 
+     * - height?: [String, Number] - can be a string like ['1em', '2px', '100%', 'auto', ...] or a number. If number, px is assumed.
+     * - sortability?: Object - object where the keys are the header keys and the value is one of ['abc', '123', 'auto', function compareFn(a, b){...}]. 
           Where auto means I'm trying to assume what type it is (maybe slow, but the default option, either number (123) or letter (abc) sorted) and 
-          CompareFn defines a custom sort order where a and b are two values and the function describes how to sort them.
-     * TODO implement: - tableStyles?: Object - styles that apply to the whole table. In object notation. exmpl.: {'border': '1px solid black', 'border-radius': '5px'}
-     * TODO implement: - headerStyles?: Object - like tablestyles but applys only to header fields.
-     * TODO implement: - bodyStyles?: Object - like tablestyles and headerStyles but applys only to body fields.
-     * TODO implement: - rowStyles?: Object - styles that apply only to specific rows. keys are the header fields and values are style objects like in tableStyles.
-     * TODO implement: - colStyles?: Array - an array of objects containing the following keys:
-          - check_column: function(colValues, colIndex, vuexState){...}: Function - a function, deciding if a column applys for this style. Should only return one of [true, false].
-          - styles: Object - style Object that applys only to columns where checkColumn returned true.
-     * TODO implement: - formatter?: Object - keys are the header keys. value is a function in the form: function(value, rowIndex, vuexState){...} that gets called for
+          CompareFn defines a custom sort order where a and b are two values and the function describes how to compare values (returns one of [-x, 0, x], where x is any number > 0). 
+     * - tableStyles?: Object - styles that apply to the whole table. In object notation. exmpl.: {'border': '1px solid black', 'border-radius': '5px'}
+     * - headerStyles?: Object - like tablestyles but applys only to header fields.
+     * - bodyStyles?: Object - like tablestyles and headerStyles but applys only to body fields.
+     * - colStyles?: Object - styles that apply only to specific columns. keys are the header fields and values are style objects like in tableStyles. Style does not apply to
+     *    header (TODO decide if that is necassary maybe optional).
+     * - rowStyles?: Array - an array of objects containing the following propertys:
+          - check_row: function(rowValues, rowIndex, vuexState, vuexGetters){...}: Function - a function, deciding if a row applys for this style. Should only return one of [true, false].
+          - styles: Object - style Object that applys only to rows where check_row returned true.
+          If different rowStyles overlap the last in the rowStyle Array has priority.
+     * - formatter?: Object - keys are the header keys. value is a function in the form: function(value, rowIndex, vuexState, vuexGetters){...} that gets called for
           every body field in the specified (key) column. Can be used for display format changes or calculations on the table data.
-     * TODO implement: - cssVariables?: Object - css variables can, if needed, be overridden. Pass an Object with the variable names as keys and desired style as value.
+     * - cssVariables?: Object - css variables can, if needed, be overridden. Pass an Object with the variable names as keys and desired style as value.
           css Variables should be overridden by the defined styles (tableStyles, headerStyles, ...) because they are supposed to be inline. So for small theme changes use 
           css Variables and for deeper changes the style Objects.
           Defined Variables with defaults after colon and usage above:
@@ -94,20 +90,37 @@ export default {
           Font-Family:
           --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
 
+          Sort-Arrow-Style:
+          --arrow-1-border: solid darkgray;
+          --arrow-2-border: solid lightgray;
+          --arrow-width: 0px 3px 3px 0px;
 
           format example: 
           {
             "--table-border": "1px solid black",
             "--header-field-border": "1px solid black",
           }
+     * - dontShowCols?: Array<String> - an Array of header fields, is hidden by default.
      * TODO maybe: - headerDef?: Object - could be an Object describing header keys. Right now headers are extracted from data.
-     * TODO maybe: - dontShowCols?: Array - an Array of header fields, is hidden by default.
+     *    could have Options like:
+     *    - displayName?: String - display this instead of header_key.
+     *    - fixWidth?: [String, Number] - set a fixed width for a column. Could also be a part of colStyles.
+     * TODO implement: - filters?: Object - has the following properties:
+     *    - connection_operation: should be one of ['and', 'or']. How the different filters are connected. 'and' only shows rows that satisfy all filters,
+     *    'or' shows rows that satisfy any of the filters.
+     *    - 
     */
     options: [Object, String],
   },
   computed: {
-    transform_options: function(){
+    transform_options(){
       return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
+    },
+    update_css_variables(){
+      
+    },
+    table_options(){
+      return this.$store.state.tableOptions;
     }
   },
   methods: {
@@ -137,7 +150,12 @@ export default {
 
   /* Font-Family: */
   --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
-  
+
+  /* Sort-Arrow-Style: */
+  --arrow-1-border: solid darkgray;
+  --arrow-2-border: solid lightgray;
+  --arrow-width: 0px 3px 3px 0px;
+
 }
 
 #app {

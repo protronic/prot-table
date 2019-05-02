@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import Vue from 'vue'
 import Vuex from 'vuex';
 // import console from 'core-js';
@@ -15,21 +16,34 @@ export default new Vuex.Store({
       data: [],
       currentSortKey: '',
       currentSortDir: '',
-      previousSorts: []
+      previousSorts: [],
+      previousSort_dirs: [],
     },
 
-    /** stores all options the table got called with. */
+    /** stores all options the table got called with. TODO remove test values. */
     tableOptions: {
-      'height': 'auto',
-      'sortability': {},
+      'height': '600px',
+      'sortability': {
+        'address': (a, b) => (Number(a.address.split(' ').pop()) - Number(b.address.split(' ').pop()))
+      },
       'tableStyles': {},
-      'headerStyles': {},
+      'headerStyles': {'font-weight': 'bold'},
       'bodyStyles': {},
-      'rowStyles': {},
-      'colStyles': {},
-      'formatter': {},
-      'cssVariables': {},
-
+      'rowStyles': [{
+        check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['company'] && rowValues['company'] === 'INJOY') ? true : false),
+        styles: {'background': 'lightgreen'}
+      },{
+        check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['index'] && rowValues['index'] > 40) ? true : false),
+        styles: {'background': 'lightblue'}
+      }],
+      'colStyles': {'address': {'text-align': 'right'}},
+      'formatter': {
+        'index': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value < 10) ? `0${value}` : value),
+        'isActive': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value) ? 'yes' : 'no'),
+        'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
+      },
+      'cssVariables': {'--header-background': 'white'},
+      'dontShowCols': ['_id']
     },
   },
   getters: {
@@ -71,7 +85,9 @@ export default new Vuex.Store({
         }
         , []);
 
-        return(header_fields);
+        return header_fields.filter(value => {                    
+          return !state.tableOptions.dontShowCols.includes(value);
+        });
       }
       catch(err){
         console.error(err);
@@ -94,23 +110,33 @@ export default new Vuex.Store({
     },
     sort_data (state, {sort_key, sort_type}){
       let previous_key = state.sortedData.currentSortKey;
+      let previous_dir = state.sortedData.currentSortDir;
       if (previous_key) state.sortedData.previousSorts.push(previous_key);
+      if (previous_dir) state.sortedData.previousSort_dirs.push(previous_dir);
       state.sortedData.currentSortKey = sort_key;
-      state.sortedData.currentSortDir = (sort_key === previous_key) ? (state.sortedData.currentSortDir === 'asc' ? 'desc' : 'asc') : ('asc');
-      state.sortedData.data = state.sortedData.data.slice().sort( (a, b) => {
-        if(sort_type === '123'){
-          return state.sortedData.currentSortDir === 'asc' ? Number(a[sort_key]) - Number(b[sort_key]) : Number(b[sort_key]) - Number(a[sort_key]);
-        }
-        else{
-          if(a[sort_key] > b[sort_key]){
-            return state.sortedData.currentSortDir === 'asc' ? 1 : -1;
+      state.sortedData.currentSortDir = (sort_key === previous_key) ? (previous_dir === 'asc' ? 'desc' : 'asc') : ('asc');
+      if (typeof sort_type !== 'function'){
+        state.sortedData.data = state.sortedData.data.slice().sort( (a, b) => {
+          if(sort_type === '123'){
+            return Number(a[sort_key]) - Number(b[sort_key]);
           }
-          else if(a[sort_key] < b[sort_key]){
-            return state.sortedData.currentSortDir === 'asc' ? -1 : 1;
+          else{
+            if(a[sort_key] > b[sort_key]){
+              return 1;
+            }
+            else if(a[sort_key] < b[sort_key]){
+              return -1;
+            }
+            else return 0;
           }
-          else return 0;
-        }
-      });
+        });
+      }
+      else{
+        state.sortedData.data = state.sortedData.data.slice().sort(sort_type);
+      }
+      if(state.sortedData.currentSortDir === 'desc'){
+        state.sortedData.data.reverse();
+      }
     }
   },
   actions: {
