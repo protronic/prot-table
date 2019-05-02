@@ -101,23 +101,27 @@ export default {
             "--header-field-border": "1px solid black",
           }
      * - dontShowCols?: Array<String> - an Array of header fields, is hidden by default.
+     * - filters?: Object - has the following properties:
+     *    - connection_operation: String - should be one of ['and', 'or']. How the different filters are connected. 'and' only shows rows that satisfy all filters,
+     *    'or' shows rows that satisfy any of the filters.
+     *    - matchFilter: Object - keys are the header keys. values are Regex or String or Callback. These are used to match the data. If a filter doesn't exist / is 
+     *    falsly for an header key, it is ignored. Both Regex and String are used with fieldValue.toString().toLowerCase().match(...). Callback is in the form: 
+     *    function(value, index, table_data){...}, should return either true or false and cycles through all entries of the key-column.
+     *    - matcherType?: String - one of ['regexp', 'string', 'function']. Optional not in use.
+     *    - showInputs: Boolean - if true, shows a row with input elements to define filters on the fly.
+     *    - inputRegExp?: Boolean - if true, values typed in the input fields get transformed into RegExp with RegExp(string), otherwise they are not changed.
+     *    - inputStyles?: Object - keys are the header keys. values are style Objects. for the input fields.
+     *    - divStyles?: Object - keys are the header keys. values are style Objects. for the divs around the input fields.
      * TODO maybe: - headerDef?: Object - could be an Object describing header keys. Right now headers are extracted from data.
      *    could have Options like:
      *    - displayName?: String - display this instead of header_key.
      *    - fixWidth?: [String, Number] - set a fixed width for a column. Could also be a part of colStyles.
-     * TODO implement: - filters?: Object - has the following properties:
-     *    - connection_operation: should be one of ['and', 'or']. How the different filters are connected. 'and' only shows rows that satisfy all filters,
-     *    'or' shows rows that satisfy any of the filters.
-     *    - 
     */
     options: [Object, String],
   },
   computed: {
     transform_options(){
       return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
-    },
-    update_css_variables(){
-      
     },
     table_options(){
       return this.$store.state.tableOptions;
@@ -156,6 +160,8 @@ export default {
   --arrow-2-border: solid lightgray;
   --arrow-width: 0px 3px 3px 0px;
 
+  /* Filter: */
+  --filter-top-offset: 0px;
 }
 
 #app {

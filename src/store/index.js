@@ -43,7 +43,13 @@ export default new Vuex.Store({
         'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
       },
       'cssVariables': {'--header-background': 'white'},
-      'dontShowCols': ['_id']
+      'dontShowCols': ['_id'],
+      'filters': {
+        'connection_operation': 'and',
+        'matchFilter': {},
+        'inputRegExp': true,
+        'showInputs': true,
+      },
     },
   },
   getters: {
@@ -102,11 +108,15 @@ export default new Vuex.Store({
     },
     override_table_option (state, tableOptions){
       for(let key in tableOptions){
-        state.tableOptions[key] = tableOptions[key];
+        Vue.set(state.tableOptions, key, tableOptions[key])
+        // state.tableOptions[key] = tableOptions[key];
       }
     },
     update_header_keys (state, headerList){
       state.headerList = headerList;
+    },
+    replace_match_filter(state, newMatchFilter){
+      state.tableOptions.filters.matchFilter = newMatchFilter;
     },
     sort_data (state, {sort_key, sort_type}){
       let previous_key = state.sortedData.currentSortKey;

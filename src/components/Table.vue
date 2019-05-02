@@ -10,6 +10,7 @@
   >
     <div 
       v-for="(key, i) in header_fields" 
+      :ref="'header'"
       :class="['header_field', 'header_col_' + i]" 
       :key="key"
       :style="[{}, table_options.headerStyles]"
@@ -21,6 +22,19 @@
         (sort_arrow.secondary_key === key) ? (sort_arrow.secondary_dir === 'asc' ? 'down_2' : 'up_2') : ''
       ]"
     ></i></div>
+    <div 
+      v-for="(col, i) in header_fields"
+      v-show="table_options.filters.showInputs" 
+      :key="'filter_' + i"
+      :class="['filter_field', 'filter_field_' + col]"
+      :style="[{'grid-row': 2}, table_options.filters.divStyles || {}]"
+    >
+      <input 
+        type="text" 
+        :style="[table_options.filters.inputStyles || {}]"
+        @input="input_changed($event, col)"
+      >
+    </div>
     <template 
       v-for="(row, j) in table_data"
     >
@@ -40,12 +54,27 @@
 </template>
 
 <script>
+import Vue from 'vue';
+
 export default {
   name: "protVueTable",
   data: function(){
     return {
-      
+      filter_inputs: {}
     };
+  },
+  updated(){
+    this.$nextTick(() => {
+      let cssVars = this.cssVariables;
+      console.log(this.$refs)
+      Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
+      Vue.set(cssVars, '--grid-template-rows', )
+      // cssVars['--filter-top-offset'] = `${this.$refs.header[0].offsetHeight}px`;
+      console.log(`${this.$refs.header[0].offsetHeight}px`);
+      this.$store.commit('override_table_option', {'cssVariables': cssVars});
+
+
+    })
   },
   computed: {
     table_data(){
@@ -60,9 +89,27 @@ export default {
           }
         }
         return result;
+      }).filter((row, row_index, table_data) => {
+        let filter = this.table_options.filters;
+        let result = [];
+        if(filter && filter.matchFilter){          
+          for(let key in filter.matchFilter){
+            if(filter.matchFilter[key]){
+              if(typeof filter.matchFilter[key] === 'string' || filter.matchFilter[key] instanceof RegExp){
+                result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
+              } 
+              else if(typeof filter.matchFilter[key] === 'function'){
+                result.push(filter.matchFilter[key](row[key], row_index, table_data));
+              }
+            }
+          }
+        }
+        return result.reduce(
+          (collector, current) => (filter.connection_operation === 'and' ? collector && current : collector || current), filter.connection_operation === 'and' ? true : false
+        );
       });
     },
-    table_options(){
+    table_options(){     /*: () => (this.$store.state.tableOptions),*/
       return this.$store.state.tableOptions;
     },
     header_fields(){
@@ -72,6 +119,7 @@ export default {
       return this.$store.getters.get_sortability;
     },
     cssVariables(){
+      console.log({css: this.$store.state.tableOptions.cssVariables})
       return this.$store.state.tableOptions.cssVariables;
     },
     sort_arrow(){
@@ -98,12 +146,21 @@ export default {
     sortClick(event, header_key){
       this.$store.dispatch('sort_action', header_key);
     },
+    input_changed(event, col){
+      try {
+        Vue.set(this.filter_inputs, col, this.table_options.filters.inputRegExp ? RegExp(event.srcElement.value, 'gim') : event.srcElement.value);
+      }
+      catch(err){
+        console.error(err);
+      }
+      this.$store.commit('replace_match_filter', this.filter_inputs);
+    },
     get_state(){
       return this.$store.state;
     },
     get_getters(){
       return this.$store.getters;
-    }
+    },
   }
 }
 </script>
@@ -119,6 +176,7 @@ export default {
   overflow-x: auto;
   box-sizing: border-box;  
   border: var(--table-border);
+  align-content: start;
 }
 
 .header_field{
@@ -129,6 +187,23 @@ export default {
   background: var(--header-background);
   color: var(--header-font-color);
   border: var(--header-field-border);
+}
+
+.filter_field {
+  grid-row: 2;
+  height: 1.5em;
+  top: var(--filter-top-offset);
+  left: 0px;
+  position: sticky;
+  box-sizing: border-box;
+}
+
+.filter_field input {
+  position: relative;
+  height: 98%;
+  width: 100%;
+  box-sizing: border-box;
+  
 }
 
 .body_field {
