@@ -1,24 +1,76 @@
 <template>
   <div id="app" ref="app">
-    <prot-vue-table></prot-vue-table>
+    <prot-vue-table :table_data="table_data" :options="options"></prot-vue-table>
 
   </div>
 </template>
 
 <script>
-import store from "./store/index";
 import protVueTable from "./components/Table.vue";
-import console from 'core-js';
 
 export default {
   name: 'app',
   components: {
     protVueTable
   },
-  store: store,
+  // store: store,
   mounted: function(){
-    this.$store.dispatch('fetch_table_data', this.data_url ? this.data_url : 'data.json'); // data.json for normal build. 
-    this.$store.commit('override_table_option', this.transform_options);
+    this.fetch_table_data(this.data_url ? this.data_url : 'data.json');
+  },
+  data(){
+    return {
+      table_data: [], 
+      // table_data: [],
+      options: {
+        "height": "auto", 
+        "sortability": {},
+        "tableStyles": {},
+        "headerStyles": {},
+        "bodyStyles": {},
+        "rowStyles": [],
+        "colStyles": {},
+        "formatter": {},
+        "cssVariables": {},
+        "dontShowCols": [],
+        "filters": {
+          "connection_operation": "and",
+          "matchFilter": {},
+          "showInputs": true,
+          "inputRegExp": true
+        }
+      },
+      // {
+      //   'height': '400px',
+      //   'sortability': {
+      //     'address': (a, b) => (Number(a.address.split(' ').pop()) - Number(b.address.split(' ').pop()))
+      //   },
+      //   'tableStyles': {},
+      //   'headerStyles': {'font-weight': 'bold'},
+      //   'bodyStyles': {},
+      //   'rowStyles': [{
+      //     check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['company'] && rowValues['company'] === 'INJOY') ? true : false),
+      //     styles: {'background': 'lightgreen'}
+      //   },{
+      //     check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['index'] && rowValues['index'] > 40) ? true : false),
+      //     styles: {'background': 'lightblue'}
+      //   }],
+      //   'colStyles': {'address': {'text-align': 'right'}},
+      //   'formatter': {
+      //     'index': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value < 10) ? `0${value}` : value),
+      //     'isActive': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value) ? 'yes' : 'no'),
+      //     'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
+      //   },
+      //   'cssVariables': {'--header-background': 'white'},
+      //   'dontShowCols': ['_id'],
+      //   'filters': {
+      //     'connection_operation': 'and',
+      //     'matchFilter': {},
+      //     'inputRegExp': true,
+      //     'showInputs': true,
+      //   },
+      // },
+
+    };
   },
   props: {
     /**
@@ -48,6 +100,8 @@ export default {
      * would translate to 2 rows and 8 columns.
      */
     data_url: String,
+    data: Array,
+    table_options: [Object, String],
 
     /** 
      * options can either be an Object or a json string with the following propertys:
@@ -117,19 +171,42 @@ export default {
      *    - displayName?: String - display this instead of header_key.
      *    - fixWidth?: [String, Number] - set a fixed width for a column. Could also be a part of colStyles.
     */
-    options: [Object, String],
+    // options: [Object, String]
   },
   computed: {
-    transform_options(){
-      return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
-    },
-    table_options(){
-      return this.$store.state.tableOptions;
-    }
+    // transform_options(){
+    //   return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
+    // }
   },
   methods: {
-
+    fetch_table_data (url){
+      return fetch(url)
+        .then( response => {
+          if(response.ok) {
+            return response.json();
+          }
+          else 
+            throw `Got response ${response.status} from ${url}.`
+        })
+        .then( data => {
+          this.table_data = data;
+        });
+    },
+    override_options(newOptions){
+      for(let key in newOptions){
+        this.$set(this.options, key, newOptions[key])
+      }
+    }
   },
+  watch: {
+    table_options: {
+      immediate: true,
+      handler(newValue, oldValue){
+        let transformedOptions = typeof newValue === 'string' ? JSON.parse(newValue) : newValue;
+        this.override_options(transformedOptions);
+      }
+    }
+  }
 }
 </script>
 
@@ -152,8 +229,9 @@ export default {
   --header-field-border: 1px solid lightgray;
   --body-field-border: 1px solid lightgray;
 
-  /* Font-Family: */
+  /* Font: */
   --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
+  --table-font-size: 1rem;
 
   /* Sort-Arrow-Style: */
   --arrow-1-border: solid darkgray;

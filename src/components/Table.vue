@@ -3,18 +3,18 @@
     id="prot_table" 
     ref="prot_table"
     :style="[{
-      'grid-template-rows': 'repeat(' + (table_data.length + 1) + ', auto)', 
+      'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
       'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
       'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
     }, table_options.tableStyles, cssVariables]"
   >
     <div 
-      v-for="(key, i) in header_fields" 
+      v-for="(key, i) in get_header_list" 
       :ref="'header'"
       :class="['header_field', 'header_col_' + i]" 
       :key="key"
       :style="[{}, table_options.headerStyles]"
-      @click="sortClick($event, key)"
+      @click="sort_action($event, key)"
     >{{ key }}<i 
       :class="[
         'arrow', 
@@ -23,7 +23,7 @@
       ]"
     ></i></div>
     <div 
-      v-for="(col, i) in header_fields"
+      v-for="(col, i) in get_header_list"
       v-show="table_options.filters.showInputs" 
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
@@ -36,17 +36,17 @@
       >
     </div>
     <template 
-      v-for="(row, j) in table_data"
+      v-for="(row, j) in display_table_data"
     >
       <div 
-        v-for="(col, i) in header_fields" 
+        v-for="(col, i) in get_header_list" 
         :key="'row' + j + 'col' + i" 
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
         :style="[].concat([
           {'grid-row': j + 3}, 
           table_options.bodyStyles, 
           (table_options.colStyles[col]) ? (table_options.colStyles[col]) : {},
-        ], table_options.rowStyles.map( value => (value.check_row(table_data[j], j, get_state, get_getters) ? value.styles : {})))"
+        ], table_options.rowStyles.map( value => (value.check_row(display_table_data[j], j) ? value.styles : {})))"
         v-html="row[col]"
       ></div>
     </template>
@@ -55,112 +55,239 @@
 
 <script>
 import Vue from 'vue';
+import debounce from 'lodash.debounce';
 
 export default {
   name: "protVueTable",
   data: function(){
     return {
-      filter_inputs: {}
+      filter_inputs: {},
+      table_options: {
+        "height": "400px", 
+        "sortability": {},
+        "tableStyles": {},
+        "headerStyles": {},
+        "bodyStyles": {},
+        "rowStyles": [],
+        "colStyles": {},
+        "formatter": {},
+        "cssVariables": {},
+        "dontShowCols": [],
+        "filters": {
+          "connection_operation": "and",
+          "matchFilter": {},
+          "showInputs": true,
+          "inputRegExp": true
+        }
+      },
+      original_table_data: [],
+      sorted_data: {
+        data: [],
+        currentSortKey: '',
+        currentSortDir: '',
+        previousSorts: [],
+        previousSort_dirs: [],
+      },
     };
+  },
+  props: {
+    table_data: Array,
+    options: Object,
+  },
+  created(){
+    this.input_changed = debounce(this.input_changed, 500, {
+      trailing: true,
+      leading: false,
+    });
+  },
+  mounted(){
+    // console.log({prop: this.table_data});
   },
   updated(){
     this.$nextTick(() => {
       let cssVars = this.cssVariables;
-      console.log(this.$refs)
-      Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
-      Vue.set(cssVars, '--grid-template-rows', )
-      // cssVars['--filter-top-offset'] = `${this.$refs.header[0].offsetHeight}px`;
-      console.log(`${this.$refs.header[0].offsetHeight}px`);
-      this.$store.commit('override_table_option', {'cssVariables': cssVars});
-
-
+      if(this.$refs && this.$refs.header){
+        Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
+      }
+      this.table_options = this.options;
     })
   },
   computed: {
-    table_data(){
-      return this.$store.state.sortedData.data.map((row, row_index) => {
-        let result = {};
-        for(let key in row){
-          if(this.table_options.formatter[key]){
-            result[key] = this.table_options.formatter[key](row[key], row_index, this.get_state, this.get_getters);
+    display_table_data(){
+      if(this.sorted_data.data){
+        return this.sorted_data.data.map((row, row_index) => {
+          let result = {};
+          for(let key in row){
+            if(this.table_options.formatter[key]){
+              result[key] = this.table_options.formatter[key](row[key], row_index);
+            }
+            else{
+              result[key] = row[key];
+            }
           }
-          else{
-            result[key] = row[key];
-          }
-        }
-        return result;
-      }).filter((row, row_index, table_data) => {
-        let filter = this.table_options.filters;
-        let result = [];
-        if(filter && filter.matchFilter){          
-          for(let key in filter.matchFilter){
-            if(filter.matchFilter[key]){
-              if(typeof filter.matchFilter[key] === 'string' || filter.matchFilter[key] instanceof RegExp){
-                result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
-              } 
-              else if(typeof filter.matchFilter[key] === 'function'){
-                result.push(filter.matchFilter[key](row[key], row_index, table_data));
+          return result;
+        }).filter((row, row_index, full_data) => {
+          let filter = this.table_options.filters;
+          let result = [];
+          if(filter && filter.matchFilter){          
+            for(let key in filter.matchFilter){
+              if(filter.matchFilter[key]){
+                if(typeof filter.matchFilter[key] === 'string'  || filter.matchFilter[key] instanceof RegExp){
+                  result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
+                } 
+                else if(typeof filter.matchFilter[key] === 'function'){
+                  result.push(filter.matchFilter[key](row[key], row_index, full_data));
+                }
               }
             }
           }
-        }
-        return result.reduce(
-          (collector, current) => (filter.connection_operation === 'and' ? collector && current : collector || current), filter.connection_operation === 'and' ? true : false
-        );
-      });
-    },
-    table_options(){     /*: () => (this.$store.state.tableOptions),*/
-      return this.$store.state.tableOptions;
-    },
-    header_fields(){
-      return this.$store.getters.get_header_list;
-    },
-    sortability(){
-      return this.$store.getters.get_sortability;
+          if(filter.connection_operation === 'or' && result.length === 0) return true;
+          return result.reduce(
+            (collector, current) => (filter.connection_operation === 'and' ? collector && current : collector || current), filter.connection_operation === 'and' ? true : false
+          );
+        });
+      }
+      else{
+        return [];
+      }
     },
     cssVariables(){
-      console.log({css: this.$store.state.tableOptions.cssVariables})
-      return this.$store.state.tableOptions.cssVariables;
+      return this.table_options.cssVariables;
     },
     sort_arrow(){
       let secondary_key = '';
       let secondary_key_pos = 0;
+      
+      if(!this.sorted_data.previousSorts) this.sorted_data.previousSorts = [];
 
-      for(let i = this.$store.state.sortedData.previousSorts.length - 1; i >= 0; i--){
-        if(this.$store.state.sortedData.previousSorts[i] !== this.$store.state.sortedData.currentSortKey){
-          secondary_key = this.$store.state.sortedData.previousSorts[i];
+      for(let i = this.sorted_data.previousSorts.length - 1; i >= 0; i--){
+        if(this.sorted_data.previousSorts[i] !== this.sorted_data.currentSortKey){
+          secondary_key = this.sorted_data.previousSorts[i];
           secondary_key_pos = i;
           break;
         }
       }
 
       return {
-        key: this.$store.state.sortedData.currentSortKey, 
-        dir: this.$store.state.sortedData.currentSortDir,
+        key: this.sorted_data.currentSortKey, 
+        dir: this.sorted_data.currentSortDir,
         secondary_key: secondary_key,
-        secondary_dir: this.$store.state.sortedData.previousSort_dirs[secondary_key_pos],
+        secondary_dir: this.sorted_data.previousSort_dirs ? (this.sorted_data.previousSort_dirs[secondary_key_pos]) : undefined,
       };
-    }
+    },
+    get_sortability (){
+      let result = {};
+      if(this.table_options.sortability){
+        for(let key in this.table_options.sortability){
+          result[key] = this.table_options.sortability[key];
+        }
+      }
+
+      if(Object.keys(result).length < this.get_header_list.length){
+        for(let i = 0; i < this.get_header_list.length; i++){
+          if(!Object.keys(result).includes(this.get_header_list[i])){
+            result[this.get_header_list[i]] = 'auto';
+          }
+        }
+      }
+
+      for(let key in result){
+        if(result[key] === 'auto'){
+          result[key] = this.original_table_data.map(value => (value[key])).reduce( (collector, current) => {
+            if(current && Number.isNaN(Number(current))){
+              return 'abc';
+            }
+            return '123';
+          }, '123');
+        }
+      }
+
+      return result;
+    },
+    get_header_list(){
+      try{
+        let header_fields = this.original_table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
+          for (let i in current){
+            if (!collector.includes(current[i])) 
+              collector.push(current[i])
+          }            
+          return collector;
+        }
+        , []);
+
+        return header_fields.filter(value => {                    
+          return !this.table_options.dontShowCols.includes(value);
+        });
+      }
+      catch(err){
+        console.error(err);
+        return [];
+      }
+    },
   },
   methods: {
-    sortClick(event, header_key){
-      this.$store.dispatch('sort_action', header_key);
-    },
     input_changed(event, col){
       try {
-        Vue.set(this.filter_inputs, col, this.table_options.filters.inputRegExp ? RegExp(event.srcElement.value, 'gim') : event.srcElement.value);
+        let value = event.srcElement.value;
+        Vue.set(this.filter_inputs, col, this.table_options.filters.inputRegExp && value !== '' ? RegExp(value, 'gim') : value);
       }
       catch(err){
         console.error(err);
       }
-      this.$store.commit('replace_match_filter', this.filter_inputs);
+      this.table_options.filters.matchFilter = this.filter_inputs;
     },
-    get_state(){
-      return this.$store.state;
+    override_table_option (){
+      for(let key in this.table_options){
+        Vue.set(this.table_options, key, this.table_options[key]);
+      }
     },
-    get_getters(){
-      return this.$store.getters;
+    sort_action(event, sort_key){
+      try{
+        this.sort_data(sort_key, this.get_sortability[sort_key])
+      }
+      catch(err){
+        console.error(err);
+      }
     },
+    sort_data (sort_key, sort_type){
+      let previous_key = this.sorted_data.currentSortKey;
+      let previous_dir = this.sorted_data.currentSortDir;
+      if (previous_key) this.sorted_data.previousSorts.push(previous_key);
+      if (previous_dir) this.sorted_data.previousSort_dirs.push(previous_dir);
+      this.sorted_data.currentSortKey = sort_key;
+      this.sorted_data.currentSortDir = (sort_key === previous_key) ? (previous_dir === 'asc' ? 'desc' : 'asc') : ('asc');
+      if (typeof sort_type !== 'function'){
+        this.sorted_data.data = this.sorted_data.data.slice().sort( (a, b) => {
+          if(sort_type === '123'){
+            return Number(a[sort_key]) - Number(b[sort_key]);
+          }
+          else{
+            if(a[sort_key] > b[sort_key]){
+              return 1;
+            }
+            else if(a[sort_key] < b[sort_key]){
+              return -1;
+            }
+            else return 0;
+          }
+        });
+      }
+      else{
+        this.sorted_data.data = this.sorted_data.data.slice().sort(sort_type);
+      }
+      if(this.sorted_data.currentSortDir === 'desc'){
+        this.sorted_data.data.reverse();
+      }
+    }
+  },
+  watch: {
+    table_data: function(newValue){
+      this.original_table_data = newValue;
+      Vue.set(this.sorted_data, 'data', newValue);
+    },
+    options: function(newValue){
+      this.table_options = newValue;
+    }
   }
 }
 </script>
@@ -173,10 +300,12 @@ export default {
   display: grid;
   position: relative;
   grid-template-rows: auto;
+  grid-template-columns: auto;
   overflow-x: auto;
   box-sizing: border-box;  
   border: var(--table-border);
   align-content: start;
+  font-size: var(--table-font-size);
 }
 
 .header_field{
@@ -203,7 +332,8 @@ export default {
   height: 98%;
   width: 100%;
   box-sizing: border-box;
-  
+  font-family: var(--table-font-family);
+  text-align: center;
 }
 
 .body_field {

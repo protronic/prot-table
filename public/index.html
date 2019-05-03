@@ -11,7 +11,34 @@
     <noscript>
       <strong>We're sorry but prot-vue-table doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app" data_url="data.json"></div>
+    <div id="app"></div>
+    <br>
+    <div id="app2"></div>
+    <!-- <div id="app2" data_url="data.json" options='{
+      "height": "400px", 
+      "sortability": {},
+      "tableStyles": {},
+      "headerStyles": {},
+      "bodyStyles": {},
+      "rowStyles": [],
+      "colStyles": {},
+      "formatter": {},
+      "cssVariables": {},
+      "dontShowCols": [],
+      "filters": {
+        "connection_operation": "and",
+        "matchFilter": {},
+        "showInputs": true,
+        "inputRegExp": true
+      }
+    }'></div> -->
     <!-- built files will be auto injected -->
+    <script>
+      setTimeout(function(){
+        console.log(document.querySelector('#app'));
+        document.querySelector('#app').table_options = {'height': '200px'}
+      }, 1000);
+      
+    </script>
   </body>
 </html>
