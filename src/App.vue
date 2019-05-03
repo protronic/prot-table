@@ -9,7 +9,7 @@
 import protVueTable from "./components/Table.vue";
 
 export default {
-  name: 'app',
+  name: 'protTableWrapper',
   components: {
     protVueTable
   },
@@ -173,11 +173,6 @@ export default {
     */
     // options: [Object, String]
   },
-  computed: {
-    // transform_options(){
-    //   return typeof this.options === 'string' ? JSON.parse(this.options) : this.options;
-    // }
-  },
   methods: {
     fetch_table_data (url){
       return fetch(url)
@@ -240,6 +235,9 @@ export default {
 
   /* Filter: */
   --filter-top-offset: 0px;
+
+  /* Grid:*/
+  --grid-template-columns: repeat(auto-fit, minmax(0.5fr, 100%));
 }
 
 #app {

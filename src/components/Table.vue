@@ -105,9 +105,10 @@ export default {
   },
   updated(){
     this.$nextTick(() => {
-      let cssVars = this.cssVariables;
+      const cssVars = this.cssVariables;
       if(this.$refs && this.$refs.header){
         Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
+        // Vue.set(cssVars, '--grid-template-columns', `repeat(${this.get_header_list.length}, minmax(50px, 100%))`)
       }
       this.table_options = this.options;
     })
@@ -300,7 +301,7 @@ export default {
   display: grid;
   position: relative;
   grid-template-rows: auto;
-  grid-template-columns: auto;
+  grid-template-columns: var(--grid-template-columns);
   overflow-x: auto;
   box-sizing: border-box;  
   border: var(--table-border);

@@ -10,6 +10,9 @@ Vue.config.productionTip = false
 // }).$mount('#app');
 
 new Vue({
+  components: {
+    App
+  },
   // render: h => h(App),
   mixins: [App],
 }).$mount('#app');
