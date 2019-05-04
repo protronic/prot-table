@@ -32,44 +32,14 @@ export default {
           "showInputs": true,
           "inputRegExp": true
         },
-        "showTimers": true
-      },
-      // {
-      //   'height': '400px',
-      //   'sortability': {
-      //     'address': (a, b) => (Number(a.address.split(' ').pop()) - Number(b.address.split(' ').pop()))
-      //   },
-      //   'tableStyles': {},
-      //   'headerStyles': {'font-weight': 'bold'},
-      //   'bodyStyles': {},
-      //   'rowStyles': [{
-      //     check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['company'] && rowValues['company'] === 'INJOY') ? true : false),
-      //     styles: {'background': 'lightgreen'}
-      //   },{
-      //     check_row: (rowValues /*, rowIndex, vuexState, vuexGetters */ ) => ((rowValues['index'] && rowValues['index'] > 40) ? true : false),
-      //     styles: {'background': 'lightblue'}
-      //   }],
-      //   'colStyles': {'address': {'text-align': 'right'}},
-      //   'formatter': {
-      //     'index': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value < 10) ? `0${value}` : value),
-      //     'isActive': (value /*, rowIndex, vuexState, vuexGetters */ ) => ((value) ? 'yes' : 'no'),
-      //     'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
-      //   },
-      //   'cssVariables': {'--header-background': 'white'},
-      //   'dontShowCols': ['_id'],
-      //   'filters': {
-      //     'connection_operation': 'and',
-      //     'matchFilter': {},
-      //     'inputRegExp': true,
-      //     'showInputs': true,
-      //   },
-      // },
-
+        "showTimers": true,
+        "headerDef": {}
+      }
     };
   },
   props: {
     /**
-     * Url where the data can be fetched from. Has to be a json file and formatted by row. 
+     * Url where the data can be fetched from. Has to be a json file and formatted by row. Data_url gets ignored when data prop is set.
      * example: 
      *      [
               {
@@ -96,7 +66,6 @@ export default {
      */
     data_url: String,
     data: [Array, String],
-    table_options: [Object, String],
 
     /** 
      * options can either be an Object or a json string with the following propertys:
@@ -161,13 +130,15 @@ export default {
      *    - inputRegExp?: Boolean - if true, values typed in the input fields get transformed into RegExp with RegExp(string), otherwise they are not changed.
      *    - inputStyles?: Object - keys are the header keys. values are style Objects. for the input fields.
      *    - divStyles?: Object - keys are the header keys. values are style Objects. for the divs around the input fields.
+     * TODO complex-css: - resizable?: Boolean - true should give the user the option to resize columns.
      * TODO implement: - headerDef?: Object - keys are the keys used in data. Value is an Object describing header keys. If set headers are not extracted from data -> faster.
      *    could have Options like:
      *    - displayName?: String - display this instead of header_key.
-     *    - fixWidth?: [String, Number] - set a fixed width for a column. Could also be a part of colStyles.
+     *    - fixWidth?: [String] - set a fixed width for a column. Could also be a part of colStyles.
      * TODO implement: - sortFor?: 
     */
     // options: [Object, String]
+    table_options: [Object, String],
   },
   methods: {
     fetch_table_data (url){
@@ -250,7 +221,7 @@ export default {
   /* Filter: */
   --filter-top-offset: 0px;
 
-  /* Grid:*/
+  /* Grid: */
   --grid-template-columns: repeat(auto-fit, minmax(0.5fr, 100%));
 }
 

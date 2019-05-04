@@ -2,20 +2,21 @@
   <div 
     id="prot_table" 
     ref="prot_table"
-    :style="[{
+    :style="[
+      update_column_sizes, {
       'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
       'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
       'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
     }, table_options.tableStyles, cssVariables]"
   >
     <div 
-      v-for="(key, i) in get_header_list" 
+      v-for="(key, i) in get_header_list.keys" 
       :ref="'header'"
       :class="['header_field', 'header_col_' + i]" 
       :key="key"
       :style="[{}, table_options.headerStyles]"
       @click="sort_action($event, key)"
-    >{{ key }}<i 
+    >{{ get_header_list.display[key] }}<i 
       :class="[
         'arrow', 
         (sort_arrow.key === key) ? (sort_arrow.dir === 'asc' ? 'down_1' : 'up_1') : '',
@@ -23,7 +24,7 @@
       ]"
     ></i></div>
     <div 
-      v-for="(col, i) in get_header_list"
+      v-for="(col, i) in get_header_list.keys"
       v-show="table_options.filters.showInputs" 
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
@@ -40,7 +41,7 @@
       v-for="(row, j) in display_table_data"
     >
       <div 
-        v-for="(col, i) in get_header_list" 
+        v-for="(col, i) in get_header_list.keys" 
         :key="'row' + j + 'col' + i" 
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
         :style="[].concat([
@@ -80,7 +81,8 @@ export default {
           "showInputs": true,
           "inputRegExp": true
         },
-        "showTimers": true
+        "showTimers": true,
+        "headerDef": {}
       },
       original_table_data: [],
       sorted_data: {
@@ -199,8 +201,8 @@ export default {
       if (this.table_options.showTimers) console.time('sort_preperation_time');
       const result = {};
       if(this.table_options.sortability){
-        for(let key in this.get_header_list){
-          const head = this.get_header_list[key];
+        for(let key in this.get_header_list.keys){
+          const head = this.get_header_list.keys[key];
           if(!this.table_options.sortability[head] || this.table_options.sortability[head] === 'auto'){
             result[head] = this.original_table_data.map(row => (row[head])).reduce( (collector, current) => (current && Number.isNaN(Number(current)) ? 'abc' : '123' ), '123');
           }
@@ -213,24 +215,44 @@ export default {
       return result;
     },
     get_header_list(){
-      try{
-        let header_fields = this.original_table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
+      if (this.table_options.showTimers) console.time('calc_header_time');
+      let header_fields = [];
+      let display_names = {};
+      let fixed_widths = {};
+      if(Object.keys(this.table_options.headerDef).length > 0){
+        for(let key in this.table_options.headerDef){
+          header_fields.push(key);
+          display_names[key] = this.table_options.headerDef[key].displayName ? this.table_options.headerDef[key].displayName : key;
+          fixed_widths[key] = this.table_options.headerDef[key].fixWidth ? this.table_options.headerDef[key].fixWidth : 'auto';
+        }
+      }
+      else {
+        header_fields = this.original_table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
           for (let i in current){
             if (!collector.includes(current[i])) 
               collector.push(current[i])
           }            
           return collector;
+        }, []);
+        for(let i in header_fields){
+          display_names[header_fields[i]] = header_fields[i];
         }
-        , []);
-
-        return header_fields.filter(value => {                    
+      }
+      const result = {
+        keys: header_fields.filter(value => {                    
           return !this.table_options.dontShowCols.includes(value);
-        });
-      }
-      catch(err){
-        console.error(err);
-        return [];
-      }
+        }),
+        display: display_names,
+        widths: fixed_widths
+      };
+      if (this.table_options.showTimers) console.timeEnd('calc_header_time');
+      return result;
+    },
+    update_column_sizes(){
+      if(Object.keys(this.get_header_list.widths).length === 0)
+        return {};
+      
+      return {'grid-template-columns': Object.keys(this.get_header_list.widths).map( value => (this.get_header_list.widths[value])).join(' ')};
     },
   },
   methods: {
@@ -261,6 +283,8 @@ export default {
       return Number(a[this.sorted_data.currentSortKey]) - Number(b[this.sorted_data.currentSortKey]);
     },
     compare_strings(a, b){
+      if(a[this.sorted_data.currentSortKey] === undefined || b[this.sorted_data.currentSortKey] === undefined)
+        return undefined;
       const aValue = a[this.sorted_data.currentSortKey].toString().toLowerCase();
       const bValue = b[this.sorted_data.currentSortKey].toString().toLowerCase();
       if(aValue > bValue){
@@ -271,9 +295,6 @@ export default {
       }
       else if(aValue === bValue){
         return 0;
-      }
-      else{
-        return undefined;
       }
     },
     sort_data (sort_key, sort_type){
@@ -314,7 +335,6 @@ export default {
   position: relative;
   grid-template-rows: auto;
   grid-template-columns: var(--grid-template-columns);
-  overflow-x: auto;
   box-sizing: border-box;  
   border: var(--table-border);
   align-content: start;
@@ -335,7 +355,7 @@ export default {
   grid-row: 2;
   height: 1.5em;
   top: var(--filter-top-offset);
-  left: 0px;
+  left: 0px; 
   position: sticky;
   box-sizing: border-box;
 }
