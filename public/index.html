@@ -11,36 +11,49 @@
     <noscript>
       <strong>We're sorry but prot-vue-table doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app">
-      <prot-table-wrapper id="prot1"></prot-table-wrapper>
-    </div>
+    <div id="app"></div>
     <br>
     <div id="app2"></div>
-    <!-- <div id="app2" data_url="data.json" options='{
-      "height": "400px", 
-      "sortability": {},
-      "tableStyles": {},
-      "headerStyles": {},
-      "bodyStyles": {},
-      "rowStyles": [],
-      "colStyles": {},
-      "formatter": {},
-      "cssVariables": {},
-      "dontShowCols": [],
-      "filters": {
-        "connection_operation": "and",
-        "matchFilter": {},
-        "showInputs": true,
-        "inputRegExp": true
-      }
-    }'></div> -->
-    <!-- built files will be auto injected -->
     <script>
-      setTimeout(function(){
-        console.log(document.querySelector('#app'));
-        document.querySelector('#app').table_options = {'height': '200px'}
-      }, 1000);
-      
+      // prot_table.data_url = 'data.json';
+      document.addEventListener('DOMContentLoaded', () => {
+        
+        prot_table.data_url = 'data.json';
+        prot_table.table_options = {
+          'height': '600px',
+        }
+      //   JSON.stringify([
+      //     {
+      //       "_id": "5bbd026039520dabb1a14e06",
+      //       "index": 0,
+      //       "isActive": false,
+      //       "first": "Ruby",
+      //       "last": "Joyce",
+      //       "company": "INJOY",
+      //       "address": "224 Jefferson Street, Talpa, New Mexico, 9637"
+      //     },
+      //     {
+      //       "_id": "5bbd026056e4b8e1a7da0bdd",
+      //       "index": 1,
+      //       "isActive": false,
+      //       "first": "Ann",
+      //       "last": "Griffith",
+      //       "company": "INJOY",
+      //       "phone": "+1 (828) 486-2051",
+      //       "address": "739 Lott Place, Carrizo, Minnesota, 7189"
+      //     },
+      //     {
+      //       "_id": "5bbd0260a146249b8f00de76",
+      //       "index": 2,
+      //       "isActive": false,
+      //       "first": "Lott",
+      //       "last": "Hopper",
+      //       "company": "INJOY",
+      //       "phone": "+1 (917) 577-2513",
+      //       "address": "915 Plymouth Street, Harrison, Northern Mariana Islands, 2621"
+      //     }
+      //   ])
+      });
     </script>
   </body>
 </html>

@@ -13,14 +13,9 @@ export default {
   components: {
     protVueTable
   },
-  // store: store,
-  mounted: function(){
-    this.fetch_table_data(this.data_url ? this.data_url : 'data.json');
-  },
   data(){
     return {
-      table_data: [], 
-      // table_data: [],
+      table_data: [],
       options: {
         "height": "auto", 
         "sortability": {},
@@ -100,7 +95,7 @@ export default {
      * would translate to 2 rows and 8 columns.
      */
     data_url: String,
-    data: Array,
+    data: [Array, String],
     table_options: [Object, String],
 
     /** 
@@ -166,10 +161,11 @@ export default {
      *    - inputRegExp?: Boolean - if true, values typed in the input fields get transformed into RegExp with RegExp(string), otherwise they are not changed.
      *    - inputStyles?: Object - keys are the header keys. values are style Objects. for the input fields.
      *    - divStyles?: Object - keys are the header keys. values are style Objects. for the divs around the input fields.
-     * TODO maybe: - headerDef?: Object - could be an Object describing header keys. Right now headers are extracted from data.
+     * TODO implement: - headerDef?: Object - keys are the keys used in data. Value is an Object describing header keys. If set headers are not extracted from data -> faster.
      *    could have Options like:
      *    - displayName?: String - display this instead of header_key.
      *    - fixWidth?: [String, Number] - set a fixed width for a column. Could also be a part of colStyles.
+     * TODO implement: - sortFor?: 
     */
     // options: [Object, String]
   },
@@ -199,6 +195,22 @@ export default {
       handler(newValue, oldValue){
         let transformedOptions = typeof newValue === 'string' ? JSON.parse(newValue) : newValue;
         this.override_options(transformedOptions);
+      }
+    },
+    data_url: {
+      immediate: true,
+      handler(newValue, oldValue){
+        if(!this.data && this.data_url){
+          this.fetch_table_data(newValue);
+        }  
+      }
+    },
+    data: {
+      immediate: true,
+      handler(newValue, oldValue){
+        if(this.data){
+          this.table_data = typeof newValue === 'string' ? JSON.parse(newValue) : newValue;
+        }
       }
     }
   }

@@ -31,8 +31,9 @@
     >
       <input 
         type="text" 
+        ref="input"
         :style="[table_options.filters.inputStyles || {}]"
-        @input="input_changed($event, col)"
+        @input="input_changed($event, col, i)"
       >
     </div>
     <template 
@@ -63,7 +64,7 @@ export default {
     return {
       filter_inputs: {},
       table_options: {
-        "height": "400px", 
+        "height": "auto", 
         "sortability": {},
         "tableStyles": {},
         "headerStyles": {},
@@ -100,9 +101,6 @@ export default {
       leading: false,
     });
   },
-  mounted(){
-    // console.log({prop: this.table_data});
-  },
   updated(){
     this.$nextTick(() => {
       const cssVars = this.cssVariables;
@@ -134,7 +132,9 @@ export default {
             for(let key in filter.matchFilter){
               if(filter.matchFilter[key]){
                 if(typeof filter.matchFilter[key] === 'string'  || filter.matchFilter[key] instanceof RegExp){
-                  result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
+                  if(row[key] !== undefined) {
+                    result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
+                  }
                 } 
                 else if(typeof filter.matchFilter[key] === 'function'){
                   result.push(filter.matchFilter[key](row[key], row_index, full_data));
@@ -227,10 +227,10 @@ export default {
     },
   },
   methods: {
-    input_changed(event, col){
+    input_changed(event, col, col_index){
       try {
-        let value = event.srcElement.value;
-        Vue.set(this.filter_inputs, col, this.table_options.filters.inputRegExp && value !== '' ? RegExp(value, 'gim') : value);
+        let value = this.$refs.input[col_index].value;
+        this.$set(this.filter_inputs, col, this.table_options.filters.inputRegExp && value !== '' ? RegExp(value, 'gim') : value);
       }
       catch(err){
         console.error(err);
@@ -239,7 +239,7 @@ export default {
     },
     override_table_option (){
       for(let key in this.table_options){
-        Vue.set(this.table_options, key, this.table_options[key]);
+        this.$set(this.table_options, key, this.table_options[key]);
       }
     },
     sort_action(event, sort_key){
@@ -292,8 +292,6 @@ export default {
   }
 }
 </script>
-
-
 
 <style scoped>
 

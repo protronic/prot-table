@@ -9,10 +9,10 @@ Vue.config.productionTip = false
 //   render: h => h(App),
 // }).$mount('#app');
 
-new Vue({
-  components: {
-    App
-  },
+window.prot_table = new Vue({
+  // components: {
+  //   App
+  // },
   // render: h => h(App),
   mixins: [App],
 }).$mount('#app');
