@@ -87,31 +87,7 @@ export default {
      * - cssVariables?: Object - css variables can, if needed, be overridden. Pass an Object with the variable names as keys and desired style as value.
           css Variables should be overridden by the defined styles (tableStyles, headerStyles, ...) because they are supposed to be inline. So for small theme changes use 
           css Variables and for deeper changes the style Objects.
-          Defined Variables with defaults after colon and usage above:
-          
-          Backgrounds:
-          --header-background: #f2f2f2;
-          --body-even-background: #ffffff;
-          --body-odd-background: #f2f2f2;
-
-          Color:
-          --table-font-color: #2c3e50;
-          --header-font-color: #2c3e50;
-          --body-even-font-color: #2c3e50;
-          --body-odd-font-color: #2c3e50;
-
-          Borders:
-          --table-border: 1px solid lightgray;
-          --header-field-border: 1px solid lightgray;
-          --body-field-border: 1px solid lightgray;
-
-          Font-Family:
-          --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
-
-          Sort-Arrow-Style:
-          --arrow-1-border: solid darkgray;
-          --arrow-2-border: solid lightgray;
-          --arrow-width: 0px 3px 3px 0px;
+          Defined Variables are at the bottom of this file.
 
           format example: 
           {
@@ -130,14 +106,17 @@ export default {
      *    - inputRegExp?: Boolean - if true, values typed in the input fields get transformed into RegExp with RegExp(string), otherwise they are not changed.
      *    - inputStyles?: Object - keys are the header keys. values are style Objects. for the input fields.
      *    - divStyles?: Object - keys are the header keys. values are style Objects. for the divs around the input fields.
-     * TODO complex-css: - resizable?: Boolean - true should give the user the option to resize columns.
-     * TODO implement: - headerDef?: Object - keys are the keys used in data. Value is an Object describing header keys. If set headers are not extracted from data -> faster.
-     *    could have Options like:
+     * - resizable?: Boolean - true should give the user the option to resize columns.
+     * - headerDef?: Object - keys are the keys used in data. Value is an Object describing header keys. If set, the headers are not extracted from data -> should be faster.
+     *    has these Options:
      *    - displayName?: String - display this instead of header_key.
-     *    - fixWidth?: [String] - set a fixed width for a column. Could also be a part of colStyles.
-     * TODO implement: - sortFor?: 
+     *    - fixWidth?: String - set a fixed width for a column.
+     *    TODO implement - toolTip?: String - a description in tooltip.
+     * TODO implement: - sortFor?: Array - an Array of Objects describing Sortorder. The Object has a key corresponding to header and the value is the sort direction ['asc', 'desc'].
+     * TODO maybe: - stickyRows
+     * TODO implement: - groupBy
+     * 
     */
-    // options: [Object, String]
     table_options: [Object, String],
   },
   methods: {
@@ -222,7 +201,17 @@ export default {
   --filter-top-offset: 0px;
 
   /* Grid: */
-  --grid-template-columns: repeat(auto-fit, minmax(0.5fr, 100%));
+  --grid-template-columns: repeat(auto-fit, minmax(max-content, 100%));
+  --grid-template-rows: repeat(auto-fill, minmax(max-content, 100%));
+  --grid-header-row: 1;
+  --grid-resize-row: 2;
+  --grid-filter-row: 3;
+
+  /* Resizability: */
+  --header-min-height: 2em;
+  --header-overflow: hidden;
+  --header-resize: horizontal;
+  --header-min-size: min-content;
 }
 
 #app {

@@ -1,54 +1,73 @@
 <template>
-  <div 
-    id="prot_table" 
+  <div
+    id="prot_table"
     ref="prot_table"
     :style="[
       update_column_sizes, {
-      'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
-      'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
-      'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
-    }, table_options.tableStyles, cssVariables]"
+        'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
+        'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
+        'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
+      }, 
+      table_options.tableStyles, 
+      cssVariables
+    ]"
+    
   >
-    <div 
-      v-for="(key, i) in get_header_list.keys" 
-      :ref="'header'"
-      :class="['header_field', 'header_col_' + i]" 
+    <div
+      v-for="(key, i) in get_header_list.keys"
       :key="key"
+      :ref="'header'"
+      :class="['header_field', 'header_col_' + i]"
       :style="[{}, table_options.headerStyles]"
       @click="sort_action($event, key)"
-    >{{ get_header_list.display[key] }}<i 
-      :class="[
+      @mouseup="if(resizable) resizeClick($event, key, i)"
+    >
+      {{ get_header_list.display[key] }}
+      <i
+        :class="[
         'arrow', 
         (sort_arrow.key === key) ? (sort_arrow.dir === 'asc' ? 'down_1' : 'up_1') : '',
         (sort_arrow.secondary_key === key) ? (sort_arrow.secondary_dir === 'asc' ? 'down_2' : 'up_2') : ''
       ]"
-    ></i></div>
-    <div 
+      ></i>
+    </div>
+    <div
+      v-show="resizable"
       v-for="(col, i) in get_header_list.keys"
-      v-show="table_options.filters.showInputs" 
+      :ref="'resize'"
+      :key="'resize_' + i"
+      :class="['resize_field', 'resize_field_' + col]"
+      :style="[{}, {}]"
+      @click="resizeClick($event, col, i)"
+    ></div>
+    <div
+      v-for="(col, i) in get_header_list.keys"
+      v-show="table_options.filters.showInputs"
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
-      :style="[{'grid-row': 2}, table_options.filters.divStyles || {}]"
+      :style="[{}, table_options.filters.divStyles || {}]"
+      @mouseup="if(resizable) resizeClick($event, col, i)"
     >
-      <input 
-        type="text" 
+      <input
+        type="text"
         ref="input"
         :style="[table_options.filters.inputStyles || {}]"
         @input="input_changed($event, col, i)"
       >
     </div>
-    <template 
-      v-for="(row, j) in display_table_data"
-    >
-      <div 
-        v-for="(col, i) in get_header_list.keys" 
-        :key="'row' + j + 'col' + i" 
+    <template v-for="(row, j) in display_table_data">
+      <div
+        v-for="(col, i) in get_header_list.keys"
+        :key="'row' + j + 'col' + i"
+        :ref="'body'"
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
         :style="[].concat([
-          {'grid-row': j + 3}, 
-          table_options.bodyStyles, 
-          (table_options.colStyles[col]) ? (table_options.colStyles[col]) : {},
-        ], table_options.rowStyles.map( value => (value.check_row(display_table_data[j], j) ? value.styles : {})))"
+            {'grid-row': j + 4}, 
+            table_options.bodyStyles, 
+            (table_options.colStyles[col]) ? (table_options.colStyles[col]) : {},
+          ], 
+          table_options.rowStyles.map( value => (value.check_row(display_table_data[j], j) ? value.styles : {}))
+        )"
         v-html="row[col]"
       ></div>
     </template>
@@ -56,134 +75,158 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import debounce from 'lodash.debounce';
+import Vue from "vue";
+import debounce from "lodash.debounce";
 
 export default {
   name: "protVueTable",
-  data: function(){
+  data: function() {
     return {
       filter_inputs: {},
       table_options: {
-        "height": "auto", 
-        "sortability": {},
-        "tableStyles": {},
-        "headerStyles": {},
-        "bodyStyles": {},
-        "rowStyles": [],
-        "colStyles": {},
-        "formatter": {},
-        "cssVariables": {},
-        "dontShowCols": [],
-        "filters": {
-          "connection_operation": "and",
-          "matchFilter": {},
-          "showInputs": true,
-          "inputRegExp": true
+        height: "auto",
+        sortability: {},
+        tableStyles: {},
+        headerStyles: {},
+        bodyStyles: {},
+        rowStyles: [],
+        colStyles: {},
+        formatter: {},
+        cssVariables: {},
+        dontShowCols: [],
+        filters: {
+          connection_operation: "and",
+          matchFilter: {},
+          showInputs: true,
+          inputRegExp: true
         },
-        "showTimers": true,
-        "headerDef": {}
+        showTimers: true,
+        headerDef: {},
+        resizable: false
       },
       original_table_data: [],
       sorted_data: {
         data: [],
-        currentSortKey: '',
-        currentSortDir: '',
+        currentSortKey: "",
+        currentSortDir: "",
         previousSorts: [],
-        previousSort_dirs: [],
-      },
+        previousSort_dirs: []
+      }
     };
   },
   props: {
     table_data: Array,
-    options: Object,
+    options: Object
   },
-  created(){
+  created() {
     this.input_changed = debounce(this.input_changed, 500, {
       trailing: true,
-      leading: false,
+      leading: false
     });
     this.sort_action = debounce(this.sort_action, 500, {
       trailing: false,
-      leading: true,
+      leading: true
     });
   },
-  updated(){
+  updated() {
     this.$nextTick(() => {
       const cssVars = this.cssVariables;
-      if(this.$refs && this.$refs.header){
-        Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
+      if (this.$refs && this.$refs.header) {
+        this.$set(
+          cssVars,
+          "--filter-top-offset",
+          `${this.$refs.header[0].offsetHeight}px`
+        );
       }
       this.table_options = this.options;
-    })
+    });
   },
   computed: {
-    display_table_data(){
-      if(this.sorted_data.data){
-        if (this.table_options.showTimers) console.time('applying_filter');
+    display_table_data() {
+      if (this.sorted_data.data) {
+        if (this.table_options.showTimers) console.time("applying_filter");
 
-        let filter_applied = this.sorted_data.data.filter((row, row_index, full_data) => {
-          let filter = this.table_options.filters;
-          let result = [];
-          if(filter && filter.matchFilter){          
-            for(let key in filter.matchFilter){
-              if(filter.matchFilter[key]){
-                if(typeof filter.matchFilter[key] === 'string'  || filter.matchFilter[key] instanceof RegExp){
-                  if(row[key] !== undefined) {
-                    result.push(row[key].toString().toLowerCase().match(filter.matchFilter[key]));
+        let filter_applied = this.sorted_data.data.filter(
+          (row, row_index, full_data) => {
+            let filter = this.table_options.filters;
+            let result = [];
+            if (filter && filter.matchFilter) {
+              for (let key in filter.matchFilter) {
+                if (filter.matchFilter[key]) {
+                  if (
+                    typeof filter.matchFilter[key] === "string" ||
+                    filter.matchFilter[key] instanceof RegExp
+                  ) {
+                    if (row[key] !== undefined) {
+                      result.push(
+                        row[key]
+                          .toString()
+                          .toLowerCase()
+                          .match(filter.matchFilter[key])
+                      );
+                    }
+                  } else if (typeof filter.matchFilter[key] === "function") {
+                    result.push(
+                      filter.matchFilter[key](row[key], row_index, full_data)
+                    );
                   }
-                } 
-                else if(typeof filter.matchFilter[key] === 'function'){
-                  result.push(filter.matchFilter[key](row[key], row_index, full_data));
                 }
               }
             }
+            if (filter.connection_operation === "or" && result.length === 0)
+              return true;
+            return result.reduce(
+              (collector, current) =>
+                filter.connection_operation === "and"
+                  ? collector && current
+                  : collector || current,
+              filter.connection_operation === "and" ? true : false
+            );
           }
-          if(filter.connection_operation === 'or' && result.length === 0) return true;
-          return result.reduce(
-            (collector, current) => (filter.connection_operation === 'and' ? collector && current : collector || current), filter.connection_operation === 'and' ? true : false
-          );
-        });
+        );
 
-        if (this.table_options.showTimers) console.timeEnd('applying_filter');
+        if (this.table_options.showTimers) console.timeEnd("applying_filter");
 
-
-        if (this.table_options.showTimers) console.time('applying_formatter');
+        if (this.table_options.showTimers) console.time("applying_formatter");
 
         let formatter_applied = filter_applied;
-        if(this.table_options.formatter){
+        if (this.table_options.formatter) {
           formatter_applied = filter_applied.map((row, row_index) => {
             const result = {};
-            for(let key in row){
-              if(this.table_options.formatter[key]){
-                result[key] = this.table_options.formatter[key](row[key], row_index);
-              }
-              else{
+            for (let key in row) {
+              if (this.table_options.formatter[key]) {
+                result[key] = this.table_options.formatter[key](
+                  row[key],
+                  row_index
+                );
+              } else {
                 result[key] = row[key];
               }
             }
             return result;
           });
         }
-        if (this.table_options.showTimers) console.timeEnd('applying_formatter');
+        if (this.table_options.showTimers)
+          console.timeEnd("applying_formatter");
 
         return formatter_applied;
-      }
-      else{
+      } else {
         return [];
       }
     },
-    cssVariables(){
+    cssVariables() {
       return this.table_options.cssVariables;
     },
-    sort_arrow(){
-      let secondary_key = '';
+    sort_arrow() {
+      let secondary_key = "";
       let secondary_key_pos = 0;
-      
-      if(!this.sorted_data.previousSorts) this.sorted_data.previousSorts = [];
 
-      for(let i = this.sorted_data.previousSorts.length - 1; i >= 0; i--){
-        if(this.sorted_data.previousSorts[i] !== this.sorted_data.currentSortKey){
+      if (!this.sorted_data.previousSorts) this.sorted_data.previousSorts = [];
+
+      for (let i = this.sorted_data.previousSorts.length - 1; i >= 0; i--) {
+        if (
+          this.sorted_data.previousSorts[i] !== this.sorted_data.currentSortKey
+        ) {
           secondary_key = this.sorted_data.previousSorts[i];
           secondary_key_pos = i;
           break;
@@ -191,171 +234,242 @@ export default {
       }
 
       return {
-        key: this.sorted_data.currentSortKey, 
+        key: this.sorted_data.currentSortKey,
         dir: this.sorted_data.currentSortDir,
         secondary_key: secondary_key,
-        secondary_dir: this.sorted_data.previousSort_dirs ? (this.sorted_data.previousSort_dirs[secondary_key_pos]) : undefined,
+        secondary_dir: this.sorted_data.previousSort_dirs
+          ? this.sorted_data.previousSort_dirs[secondary_key_pos]
+          : undefined
       };
     },
-    get_sortability (){
-      if (this.table_options.showTimers) console.time('sort_preperation_time');
+    get_sortability() {
+      if (this.table_options.showTimers) console.time("sort_preperation_time");
       const result = {};
-      if(this.table_options.sortability){
-        for(let key in this.get_header_list.keys){
+      if (this.table_options.sortability) {
+        for (let key in this.get_header_list.keys) {
           const head = this.get_header_list.keys[key];
-          if(!this.table_options.sortability[head] || this.table_options.sortability[head] === 'auto'){
-            result[head] = this.original_table_data.map(row => (row[head])).reduce( (collector, current) => (current && Number.isNaN(Number(current)) ? 'abc' : '123' ), '123');
-          }
-          else{
+          if (
+            !this.table_options.sortability[head] ||
+            this.table_options.sortability[head] === "auto"
+          ) {
+            result[head] = this.original_table_data
+              .map(row => row[head])
+              .reduce(
+                (collector, current) =>
+                  current && Number.isNaN(Number(current)) ? "abc" : "123",
+                "123"
+              );
+          } else {
             result[head] = this.table_options.sortability[head];
           }
         }
       }
-      if (this.table_options.showTimers) console.timeEnd('sort_preperation_time');
+      if (this.table_options.showTimers)
+        console.timeEnd("sort_preperation_time");
       return result;
     },
-    get_header_list(){
-      if (this.table_options.showTimers) console.time('calc_header_time');
+    get_header_list() {
+      if (this.table_options.showTimers) console.time("calc_header_time");
       let header_fields = [];
       let display_names = {};
       let fixed_widths = {};
-      if(Object.keys(this.table_options.headerDef).length > 0){
-        for(let key in this.table_options.headerDef){
+      if (Object.keys(this.table_options.headerDef).length > 0) {
+        for (let key in this.table_options.headerDef) {
           header_fields.push(key);
-          display_names[key] = this.table_options.headerDef[key].displayName ? this.table_options.headerDef[key].displayName : key;
-          fixed_widths[key] = this.table_options.headerDef[key].fixWidth ? this.table_options.headerDef[key].fixWidth : 'auto';
+          display_names[key] = this.table_options.headerDef[key].displayName
+            ? this.table_options.headerDef[key].displayName
+            : key;
+          fixed_widths[key] = this.table_options.headerDef[key].fixWidth
+            ? this.table_options.headerDef[key].fixWidth
+            : "auto";
         }
-      }
-      else {
-        header_fields = this.original_table_data.map( value => (Object.keys(value)) ).reduce( (collector, current) => {
-          for (let i in current){
-            if (!collector.includes(current[i])) 
-              collector.push(current[i])
-          }            
-          return collector;
-        }, []);
-        for(let i in header_fields){
+      } else {
+        header_fields = this.original_table_data
+          .map(value => Object.keys(value))
+          .reduce((collector, current) => {
+            for (let i in current) {
+              if (!collector.includes(current[i])) collector.push(current[i]);
+            }
+            return collector;
+          }, []);
+        for (let i in header_fields) {
           display_names[header_fields[i]] = header_fields[i];
         }
       }
       const result = {
-        keys: header_fields.filter(value => {                    
+        keys: header_fields.filter(value => {
           return !this.table_options.dontShowCols.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
       };
-      if (this.table_options.showTimers) console.timeEnd('calc_header_time');
+      if (this.table_options.showTimers) console.timeEnd("calc_header_time");
       return result;
     },
-    update_column_sizes(){
-      if(Object.keys(this.get_header_list.widths).length === 0)
-        return {};
-      
-      return {'grid-template-columns': Object.keys(this.get_header_list.widths).map( value => (this.get_header_list.widths[value])).join(' ')};
-    },
+    update_column_sizes() {
+      if (Object.keys(this.get_header_list.widths).length === 0) return {};
+
+      return {
+        "grid-template-columns": Object.keys(this.get_header_list.widths)
+          .map(value => this.get_header_list.widths[value])
+          .join(" ")
+      };
+    }
   },
   methods: {
-    input_changed(event, col, col_index){
+    resizeClick(event, col, ind){
+      // if(!col && !ind){
+      //   for (let i in this.$refs.resize) {
+      //     this.$refs.resize[i].style.width = "auto";
+      //   }
+      // }
+      // else{
+      this.$refs.resize[ind].style.width = this.$refs.header[ind].offsetWidth;
+      console.log({new: this.$refs.resize[ind].style.width, old: this.$refs.header[ind].offsetWidth})
+      // }
+      
+    },
+    input_changed(event, col, col_index) {
       try {
         let value = this.$refs.input[col_index].value;
-        this.$set(this.filter_inputs, col, this.table_options.filters.inputRegExp && value !== '' ? RegExp(value, 'gim') : value);
-      }
-      catch(err){
+        this.$set(
+          this.filter_inputs,
+          col,
+          this.table_options.filters.inputRegExp && value !== ""
+            ? RegExp(value, "gim")
+            : value
+        );
+      } catch (err) {
         console.error(err);
       }
       this.table_options.filters.matchFilter = this.filter_inputs;
     },
-    override_table_option (){
-      for(let key in this.table_options){
+    override_table_option() {
+      for (let key in this.table_options) {
         this.$set(this.table_options, key, this.table_options[key]);
       }
     },
-    sort_action(event, sort_key){
-      try{
-        this.sort_data(sort_key, this.get_sortability[sort_key])
-      }
-      catch(err){
+    sort_action(event, sort_key) {
+      try {
+        this.sort_data(sort_key, this.get_sortability[sort_key]);
+      } catch (err) {
         console.error(err);
       }
     },
-    compare_numbers(a, b){
-      return Number(a[this.sorted_data.currentSortKey]) - Number(b[this.sorted_data.currentSortKey]);
+    compare_numbers(a, b) {
+      return (
+        Number(a[this.sorted_data.currentSortKey]) -
+        Number(b[this.sorted_data.currentSortKey])
+      );
     },
-    compare_strings(a, b){
-      if(a[this.sorted_data.currentSortKey] === undefined || b[this.sorted_data.currentSortKey] === undefined)
+    compare_strings(a, b) {
+      if (
+        a[this.sorted_data.currentSortKey] === undefined ||
+        b[this.sorted_data.currentSortKey] === undefined
+      )
         return undefined;
-      const aValue = a[this.sorted_data.currentSortKey].toString().toLowerCase();
-      const bValue = b[this.sorted_data.currentSortKey].toString().toLowerCase();
-      if(aValue > bValue){
+      const aValue = a[this.sorted_data.currentSortKey]
+        .toString()
+        .toLowerCase();
+      const bValue = b[this.sorted_data.currentSortKey]
+        .toString()
+        .toLowerCase();
+      if (aValue > bValue) {
         return 1;
-      }
-      else if(aValue < bValue){
+      } else if (aValue < bValue) {
         return -1;
-      }
-      else if(aValue === bValue){
+      } else if (aValue === bValue) {
         return 0;
       }
     },
-    sort_data (sort_key, sort_type){
-      if (this.table_options.showTimers) console.time('sort_time');
+    sort_data(sort_key, sort_type) {
+      if (this.table_options.showTimers) console.time("sort_time");
       const previous_key = this.sorted_data.currentSortKey;
       const previous_dir = this.sorted_data.currentSortDir;
       if (previous_key) this.sorted_data.previousSorts.push(previous_key);
       if (previous_dir) this.sorted_data.previousSort_dirs.push(previous_dir);
       this.sorted_data.currentSortKey = sort_key;
-      this.sorted_data.currentSortDir = (sort_key === previous_key) ? (previous_dir === 'asc' ? 'desc' : 'asc') : ('asc');
-      if (typeof sort_type !== 'function'){
-        this.sorted_data.data = this.sorted_data.data.slice().sort( (a, b) => (sort_type === '123' ? this.compare_numbers(a, b) : this.compare_strings(a, b)));
+      this.sorted_data.currentSortDir =
+        sort_key === previous_key
+          ? previous_dir === "asc"
+            ? "desc"
+            : "asc"
+          : "asc";
+      if (typeof sort_type !== "function") {
+        this.sorted_data.data = this.sorted_data.data
+          .slice()
+          .sort((a, b) =>
+            sort_type === "123"
+              ? this.compare_numbers(a, b)
+              : this.compare_strings(a, b)
+          );
       } else {
         this.sorted_data.data = this.sorted_data.data.slice().sort(sort_type);
       }
-      if(this.sorted_data.currentSortDir === 'desc'){
+      if (this.sorted_data.currentSortDir === "desc") {
         this.sorted_data.data.reverse();
       }
-      if (this.table_options.showTimers) console.timeEnd('sort_time');
+      if (this.table_options.showTimers) console.timeEnd("sort_time");
     }
   },
   watch: {
-    table_data: function(newValue){
+    table_data: function(newValue) {
       this.original_table_data = newValue;
-      Vue.set(this.sorted_data, 'data', newValue);
+      Vue.set(this.sorted_data, "data", newValue);
     },
-    options: function(newValue){
+    options: function(newValue) {
       this.table_options = newValue;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-
-#prot_table{
+#prot_table {
   display: grid;
   position: relative;
   grid-template-rows: auto;
   grid-template-columns: var(--grid-template-columns);
-  box-sizing: border-box;  
+  box-sizing: border-box;
   border: var(--table-border);
   align-content: start;
   font-size: var(--table-font-size);
+  background: var(--header-background);
 }
 
-.header_field{
-  grid-row: 1;
+.header_field {
+  grid-row: var(--grid-header-row);
   position: sticky;
   top: 0px;
   left: 0px;
+  min-height: var(--header-min-height);
+  overflow: var(--header-overflow);
+  /* resize: var(--header-resize); */
+  min-width: var(--header-min-size);
   background: var(--header-background);
   color: var(--header-font-color);
   border: var(--header-field-border);
+  border-bottom: none;
+}
+
+.resize_field {
+  grid-row: var(--grid-resize-row);
+  content: ' ';
+  min-height: 0.6em;
+  overflow: var(--header-overflow);
+  resize: var(--header-resize);
+  min-width: var(--header-min-size);
+  background: var(--header-background);
+  color: var(--header-font-color);
+  border: var(--header-field-border);
+  border-top: none;
 }
 
 .filter_field {
-  grid-row: 2;
+  grid-row: var(--grid-filter-row);
   height: 1.5em;
   top: var(--filter-top-offset);
-  left: 0px; 
+  left: 0px;
   position: sticky;
   box-sizing: border-box;
 }
@@ -365,8 +479,12 @@ export default {
   height: 98%;
   width: 100%;
   box-sizing: border-box;
+  border: var(--header-field-border);
   font-family: var(--table-font-family);
   text-align: center;
+  -webkit-box-shadow: inset 0px 0px 3% 6% rgba(0, 7, 89, 1);
+  -moz-box-shadow: inset 0px 0px 3% 6% rgba(0, 7, 89, 1);
+  box-shadow: inset 0px 0px 3% 6% rgba(0, 7, 89, 1);
 }
 
 .body_field {
@@ -383,7 +501,9 @@ export default {
   color: var(--body-odd-font-color);
 }
 
-.header_field, .body_field {
+.header_field,
+.body_field,
+.input_field {
   box-sizing: border-box;
   padding: 5px;
 }
@@ -398,24 +518,27 @@ export default {
   border: none;
 }
 
-.up_1, .down_1 {
+.up_1,
+.down_1 {
   border: var(--arrow-1-border);
   border-width: var(--arrow-width);
 }
 
-.up_2, .down_2 {
+.up_2,
+.down_2 {
   border: var(--arrow-2-border);
   border-width: var(--arrow-width);
 }
 
-.up_1, .up_2 {
+.up_1,
+.up_2 {
   transform: rotate(-135deg);
   -webkit-transform: rotate(-135deg);
 }
 
-.down_1, .down_2 {
+.down_1,
+.down_2 {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
 }
-
 </style>
