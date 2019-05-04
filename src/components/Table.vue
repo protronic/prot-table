@@ -79,7 +79,8 @@ export default {
           "matchFilter": {},
           "showInputs": true,
           "inputRegExp": true
-        }
+        },
+        "showTimers": true
       },
       original_table_data: [],
       sorted_data: {
@@ -100,13 +101,16 @@ export default {
       trailing: true,
       leading: false,
     });
+    this.sort_action = debounce(this.sort_action, 500, {
+      trailing: false,
+      leading: true,
+    });
   },
   updated(){
     this.$nextTick(() => {
       const cssVars = this.cssVariables;
       if(this.$refs && this.$refs.header){
         Vue.set(cssVars, '--filter-top-offset', `${this.$refs.header[0].offsetHeight}px`);
-        // Vue.set(cssVars, '--grid-template-columns', `repeat(${this.get_header_list.length}, minmax(50px, 100%))`)
       }
       this.table_options = this.options;
     })
@@ -114,18 +118,9 @@ export default {
   computed: {
     display_table_data(){
       if(this.sorted_data.data){
-        return this.sorted_data.data.map((row, row_index) => {
-          let result = {};
-          for(let key in row){
-            if(this.table_options.formatter[key]){
-              result[key] = this.table_options.formatter[key](row[key], row_index);
-            }
-            else{
-              result[key] = row[key];
-            }
-          }
-          return result;
-        }).filter((row, row_index, full_data) => {
+        if (this.table_options.showTimers) console.time('applying_filter');
+
+        let filter_applied = this.sorted_data.data.filter((row, row_index, full_data) => {
           let filter = this.table_options.filters;
           let result = [];
           if(filter && filter.matchFilter){          
@@ -147,6 +142,30 @@ export default {
             (collector, current) => (filter.connection_operation === 'and' ? collector && current : collector || current), filter.connection_operation === 'and' ? true : false
           );
         });
+
+        if (this.table_options.showTimers) console.timeEnd('applying_filter');
+
+
+        if (this.table_options.showTimers) console.time('applying_formatter');
+
+        let formatter_applied = filter_applied;
+        if(this.table_options.formatter){
+          formatter_applied = filter_applied.map((row, row_index) => {
+            const result = {};
+            for(let key in row){
+              if(this.table_options.formatter[key]){
+                result[key] = this.table_options.formatter[key](row[key], row_index);
+              }
+              else{
+                result[key] = row[key];
+              }
+            }
+            return result;
+          });
+        }
+        if (this.table_options.showTimers) console.timeEnd('applying_formatter');
+
+        return formatter_applied;
       }
       else{
         return [];
@@ -177,32 +196,20 @@ export default {
       };
     },
     get_sortability (){
-      let result = {};
+      if (this.table_options.showTimers) console.time('sort_preperation_time');
+      const result = {};
       if(this.table_options.sortability){
-        for(let key in this.table_options.sortability){
-          result[key] = this.table_options.sortability[key];
-        }
-      }
-
-      if(Object.keys(result).length < this.get_header_list.length){
-        for(let i = 0; i < this.get_header_list.length; i++){
-          if(!Object.keys(result).includes(this.get_header_list[i])){
-            result[this.get_header_list[i]] = 'auto';
+        for(let key in this.get_header_list){
+          const head = this.get_header_list[key];
+          if(!this.table_options.sortability[head] || this.table_options.sortability[head] === 'auto'){
+            result[head] = this.original_table_data.map(row => (row[head])).reduce( (collector, current) => (current && Number.isNaN(Number(current)) ? 'abc' : '123' ), '123');
+          }
+          else{
+            result[head] = this.table_options.sortability[head];
           }
         }
       }
-
-      for(let key in result){
-        if(result[key] === 'auto'){
-          result[key] = this.original_table_data.map(value => (value[key])).reduce( (collector, current) => {
-            if(current && Number.isNaN(Number(current))){
-              return 'abc';
-            }
-            return '123';
-          }, '123');
-        }
-      }
-
+      if (this.table_options.showTimers) console.timeEnd('sort_preperation_time');
       return result;
     },
     get_header_list(){
@@ -250,35 +257,42 @@ export default {
         console.error(err);
       }
     },
+    compare_numbers(a, b){
+      return Number(a[this.sorted_data.currentSortKey]) - Number(b[this.sorted_data.currentSortKey]);
+    },
+    compare_strings(a, b){
+      const aValue = a[this.sorted_data.currentSortKey].toString().toLowerCase();
+      const bValue = b[this.sorted_data.currentSortKey].toString().toLowerCase();
+      if(aValue > bValue){
+        return 1;
+      }
+      else if(aValue < bValue){
+        return -1;
+      }
+      else if(aValue === bValue){
+        return 0;
+      }
+      else{
+        return undefined;
+      }
+    },
     sort_data (sort_key, sort_type){
-      let previous_key = this.sorted_data.currentSortKey;
-      let previous_dir = this.sorted_data.currentSortDir;
+      if (this.table_options.showTimers) console.time('sort_time');
+      const previous_key = this.sorted_data.currentSortKey;
+      const previous_dir = this.sorted_data.currentSortDir;
       if (previous_key) this.sorted_data.previousSorts.push(previous_key);
       if (previous_dir) this.sorted_data.previousSort_dirs.push(previous_dir);
       this.sorted_data.currentSortKey = sort_key;
       this.sorted_data.currentSortDir = (sort_key === previous_key) ? (previous_dir === 'asc' ? 'desc' : 'asc') : ('asc');
       if (typeof sort_type !== 'function'){
-        this.sorted_data.data = this.sorted_data.data.slice().sort( (a, b) => {
-          if(sort_type === '123'){
-            return Number(a[sort_key]) - Number(b[sort_key]);
-          }
-          else{
-            if(a[sort_key] > b[sort_key]){
-              return 1;
-            }
-            else if(a[sort_key] < b[sort_key]){
-              return -1;
-            }
-            else return 0;
-          }
-        });
-      }
-      else{
+        this.sorted_data.data = this.sorted_data.data.slice().sort( (a, b) => (sort_type === '123' ? this.compare_numbers(a, b) : this.compare_strings(a, b)));
+      } else {
         this.sorted_data.data = this.sorted_data.data.slice().sort(sort_type);
       }
       if(this.sorted_data.currentSortDir === 'desc'){
         this.sorted_data.data.reverse();
       }
+      if (this.table_options.showTimers) console.timeEnd('sort_time');
     }
   },
   watch: {

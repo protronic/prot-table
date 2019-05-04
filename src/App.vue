@@ -1,7 +1,6 @@
 <template>
   <div id="app" ref="app">
     <prot-vue-table :table_data="table_data" :options="options"></prot-vue-table>
-
   </div>
 </template>
 
@@ -32,7 +31,8 @@ export default {
           "matchFilter": {},
           "showInputs": true,
           "inputRegExp": true
-        }
+        },
+        "showTimers": true
       },
       // {
       //   'height': '400px',
@@ -171,6 +171,7 @@ export default {
   },
   methods: {
     fetch_table_data (url){
+      if (this.options.showTimers) console.time('fetch_time');
       return fetch(url)
         .then( response => {
           if(response.ok) {
@@ -181,6 +182,7 @@ export default {
         })
         .then( data => {
           this.table_data = data;
+          if (this.options.showTimers) console.timeEnd('fetch_time');
         });
     },
     override_options(newOptions){
