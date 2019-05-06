@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>prot-table</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+    <script src="./web-component/prot-table.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but prot-table doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <script>
+      document.addEventListener('DOMContentLoaded', function(e){
+        let p = document.createElement('prot-table');
+        
+        p.setAttribute('data_url', 'data.json');
+        document.body.append(p);
+
+        p.table_options = {
+          'height': '400px',
+          'sortability': {
+            'address': (a, b) => (Number(a.address.split(' ').pop()) - Number(b.address.split(' ').pop()))
+          },
+          'tableStyles': {},
+          'headerStyles': {'font-weight': 'bold'},
+          'bodyStyles': {},
+          'rowStyles': [{
+            check_row: (rowValues) => ((rowValues['company'] && rowValues['company'] === 'INJOY') ? true : false),
+            styles: {'background': 'lightgreen'}
+          },{
+            check_row: (rowValues) => ((rowValues['index'] && rowValues['index'] > 40) ? true : false),
+            styles: {'background': 'lightblue'}
+          }],
+          'colStyles': {'address': {'text-align': 'right'}},
+          'formatter': {
+            'index': (value) => ((value < 10) ? `0${value}` : value),
+            'isActive': (value) => ((value) ? 'yes' : 'no'),
+            'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
+          },
+          'cssVariables': {'--header-background': 'white'},
+          'dontShowCols': ['_id'],
+          'filters': {
+            'connection_operation': 'and',
+            'matchFilter': {},
+            'inputRegExp': true,
+            'showInputs': true,
+          },
+          'headerDef': {
+            'index': {
+              'displayName': 'Index',
+              // 'fixWidth': '300px'
+            },
+            'isActive': {
+              'displayName': 'Aktiv',
+            },
+            'first': {
+              'displayName': 'Vorname',
+            },
+            'last': {
+              'displayName': 'Nachname',
+            },
+            'company': {
+              'displayName': 'Firma',
+            },
+            'address': {
+              'displayName': 'Adresse',
+            },
+            'phone': {
+              'displayName': 'Telefon',
+            },
+          },
+          // 'resizable': true,
+        };
+      });
+      
+    </script>
+  </body>
+</html>

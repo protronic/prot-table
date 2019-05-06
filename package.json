@@ -17,7 +17,7 @@
   "repository": "github:protronic/prot-table",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table && cp public/demo.html dist/index.html && cp public/data.json dist/data.json",
+    "build": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table && cp public/web-component.html dist/index.html && cp public/data.json dist/data.json",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
