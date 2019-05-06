@@ -6,6 +6,16 @@ A customizable table component in vue. Intended to be used as a web-component or
 
 ## Installation
 
+### Install from NPM
+
+Run:
+
+```
+npm install prot-table
+```
+
+### Build from Source
+
 Install dependencies:
 
 ```npm install```
@@ -21,6 +31,13 @@ vue-cli-service build --mode production --dest dist/web-component --target wc --
 ### Use as Web-Component
 
 Include Vue and the Component:
+
+```javascript
+import Vue from 'vue';
+import protTable from 'prot-table';
+```
+
+OR
 
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
