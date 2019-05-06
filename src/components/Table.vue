@@ -20,7 +20,7 @@
       :class="['header_field', 'header_col_' + i]"
       :style="[{}, table_options.headerStyles]"
       @click="sort_action($event, key)"
-      @mouseup="if(resizable) resizeClick($event, key, i)"
+      @mouseup="table_options.resizable ? resizeClick($event, key, i) : false"
     >
       {{ get_header_list.display[key] }}
       <i
@@ -32,7 +32,7 @@
       ></i>
     </div>
     <div
-      v-show="resizable"
+      v-show="table_options.resizable"
       v-for="(col, i) in get_header_list.keys"
       :ref="'resize'"
       :key="'resize_' + i"
@@ -46,7 +46,7 @@
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
       :style="[{}, table_options.filters.divStyles || {}]"
-      @mouseup="if(resizable) resizeClick($event, col, i)"
+      @mouseup="table_options.resizable ? resizeClick($event, col, i) : false"
     >
       <input
         type="text"

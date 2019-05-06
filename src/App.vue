@@ -33,7 +33,8 @@ export default {
           "inputRegExp": true
         },
         "showTimers": true,
-        "headerDef": {}
+        "headerDef": {},
+        "resizable": false,
       }
     };
   },
