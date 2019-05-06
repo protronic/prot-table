@@ -41,7 +41,7 @@ OR
 
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
-<script src="./web-component/prot-table.js"></script>
+<script src="prot-table"></script>
 ```
 
 Use the `<prot-table></prot-table>` tag with appropriate attributes:
