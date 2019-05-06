@@ -4,7 +4,7 @@
 
 A customizable table component in vue. Intended to be used as a web-component or as a component in vue projects.
 
-[demo] (https://lih-programmer.live/prot-table/)
+[demo](https://lih-programmer.live/prot-table/)
 
 ## Installation
 
