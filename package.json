@@ -1,6 +1,6 @@
 {
   "name": "prot-table",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Robert Seidler",
     "email": "robert.seidler1@gmail.com",
@@ -8,10 +8,13 @@
   },
   "license": "MIT",
   "homepage": "https://flaviocopes.com/package",
-  "keywords": ["web-component", "vue", "table"],
+  "keywords": [
+    "web-component",
+    "vue",
+    "table"
+  ],
   "description": "A customizable table component in vue. Intended to be used as a web-component.",
   "repository": "github:protronic/prot-table",
-
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table && cp public/demo.html dist/index.html && cp public/data.json dist/data.json",
