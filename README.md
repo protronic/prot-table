@@ -4,7 +4,20 @@
 
 A customizable table component in vue. Intended to be used as a web-component or as a component in vue projects.
 
+[demo](https://lih-programmer.live/prot-table/)
+[jsfiddle](https://jsfiddle.net/razoth/04nrhf87/8/)
+
 ## Installation
+
+### Install from NPM
+
+Run:
+
+```
+npm install prot-table
+```
+
+### Build from Source
 
 Install dependencies:
 
@@ -22,9 +35,16 @@ vue-cli-service build --mode production --dest dist/web-component --target wc --
 
 Include Vue and the Component:
 
+```javascript
+import Vue from 'vue';
+import protTable from 'prot-table';
+```
+
+OR
+
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
-<script src="./web-component/prot-table.js"></script>
+<script src="prot-table"></script>
 ```
 
 Use the `<prot-table></prot-table>` tag with appropriate attributes:
