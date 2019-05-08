@@ -1,5 +1,5 @@
 <template>
-  <div id="app" ref="app">
+  <div id="protapp" ref="app">
     <prot-vue-table :table_data="table_data" :options="options"></prot-vue-table>
   </div>
 </template>
@@ -172,7 +172,7 @@ export default {
 
 <style>
 /* Variable Definitions */
-#app {
+#protapp {
   /* Backgrounds: */
   --header-background: #f2f2f2;
   --body-even-background: #ffffff;
@@ -215,7 +215,7 @@ export default {
   --header-min-size: min-content;
 }
 
-#app {
+#protapp {
   font-family: var(--table-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
