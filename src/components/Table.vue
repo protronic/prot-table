@@ -14,7 +14,7 @@
     
   >
     <div
-      v-for="(key, i) in get_header_list.keys"
+      v-for="(key, i) of get_header_list.keys"
       :key="key"
       :ref="'header'"
       :class="['header_field', 'header_col_' + i]"
@@ -33,7 +33,7 @@
     </div>
     <div
       v-show="table_options.resizable"
-      v-for="(col, i) in get_header_list.keys"
+      v-for="(col, i) of get_header_list.keys"
       :ref="'resize'"
       :key="'resize_' + i"
       :class="['resize_field', 'resize_field_' + col]"
@@ -41,7 +41,7 @@
       @click="resizeClick($event, col, i)"
     ></div>
     <div
-      v-for="(col, i) in get_header_list.keys"
+      v-for="(col, i) of get_header_list.keys"
       v-show="table_options.filters.showInputs"
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
@@ -55,7 +55,7 @@
         @input="input_changed($event, col, i)"
       >
     </div>
-    <template v-for="(row, j) in display_table_data">
+    <template v-for="(row, j) of display_table_data">
       <div
         v-for="(col, i) in get_header_list.keys"
         :key="'row' + j + 'col' + i"
@@ -325,7 +325,6 @@ export default {
       // }
       // else{
       this.$refs.resize[ind].style.width = this.$refs.header[ind].offsetWidth;
-      console.log({new: this.$refs.resize[ind].style.width, old: this.$refs.header[ind].offsetWidth})
       // }
       
     },
