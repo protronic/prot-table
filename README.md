@@ -31,7 +31,7 @@ vue-cli-service build --mode production --dest dist/web-component --target wc --
 
 ## Usage 
 
-### Use as Web-Component
+### Use as Web-Component (Not working right now)
 
 Include Vue and the Component:
 
@@ -45,6 +45,13 @@ OR
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="prot-table"></script>
+```
+
+### Use as a Vue Component
+
+Import it from `prot-table` and it gets registered as a Vue component for further use.
+```javascript 
+import ProtTable from 'prot-table'
 ```
 
 Use the `<prot-table></prot-table>` tag with appropriate attributes:
