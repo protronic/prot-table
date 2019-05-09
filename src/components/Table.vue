@@ -56,8 +56,8 @@
       >
     </div>
     <template v-for="(row, j) in display_table_data">
+      <template v-for="(col, i) in get_header_list.keys">
       <div
-        v-for="(col, i) in get_header_list.keys"
         :key="'row' + j + 'col' + i"
         :ref="'body'"
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
@@ -70,6 +70,12 @@
         )"
         v-html="row[col]"
       ></div>
+      <div
+        :key="'row_details' + j + '_col' + i"
+        :ref="'detail'"
+        :class="['details_field']"
+      ></div>
+      </template>
     </template>
   </div>
 </template>

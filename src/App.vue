@@ -170,7 +170,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* Variable Definitions */
 #protapp {
   /* Backgrounds: */
