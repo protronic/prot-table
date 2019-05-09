@@ -209,13 +209,11 @@ export default {
                 result[key] = row[key];
               }
             }
-            console.log(result);
             return result;
           });
         }
         if (this.table_options.showTimers)
           console.timeEnd("applying_formatter");
-        console.log(formatter_applied);
         return formatter_applied;
       } else {
         return [];
@@ -303,7 +301,6 @@ export default {
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
         }
-        console.log('header_first', header_fields, display_names);
       }
       const result = {
         keys: header_fields.filter(value => {
