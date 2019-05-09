@@ -246,7 +246,7 @@ export default {
       if (this.table_options.showTimers) console.time("sort_preperation_time");
       const result = {};
       if (this.table_options.sortability) {
-        for (let key = 0; key < this.get_header_list.keys; key++) {
+        for (let key = 0; key < this.get_header_list.keys.length; key++) {
           const head = this.get_header_list.keys[key];
           if (
             !this.table_options.sortability[head] ||
@@ -287,12 +287,12 @@ export default {
         header_fields = this.original_table_data
           .map(value => Object.keys(value))
           .reduce((collector, current) => {
-            for (let i in current) {
+            for (let i = 0; i < current.length; i++) {
               if (!collector.includes(current[i])) collector.push(current[i]);
             }
             return collector;
           }, []);
-        for (let i in header_fields) {
+        for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
         }
       }
