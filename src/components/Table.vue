@@ -246,7 +246,7 @@ export default {
       if (this.table_options.showTimers) console.time("sort_preperation_time");
       const result = {};
       if (this.table_options.sortability) {
-        for (let key in this.get_header_list.keys) {
+        for (let key = 0; key < this.get_header_list.keys; key++) {
           const head = this.get_header_list.keys[key];
           if (
             !this.table_options.sortability[head] ||
