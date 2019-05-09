@@ -57,7 +57,7 @@
     </div>
     <template v-for="(row, j) of display_table_data">
       <div
-        v-for="(col, i) in get_header_list.keys"
+        v-for="(col, i) of get_header_list.keys"
         :key="'row' + j + 'col' + i"
         :ref="'body'"
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
@@ -80,6 +80,11 @@ import debounce from "lodash.debounce";
 
 export default {
   name: "protVueTable",
+  created(){
+    for(let i in []){
+      this.dont_schow.push(i);
+    }
+  }, 
   data: function() {
     return {
       filter_inputs: {},
@@ -111,7 +116,8 @@ export default {
         currentSortDir: "",
         previousSorts: [],
         previousSort_dirs: []
-      }
+      },
+      dont_schow = [],
     };
   },
   props: {
@@ -203,12 +209,13 @@ export default {
                 result[key] = row[key];
               }
             }
+            console.log(result);
             return result;
           });
         }
         if (this.table_options.showTimers)
           console.timeEnd("applying_formatter");
-
+        console.log(formatter_applied);
         return formatter_applied;
       } else {
         return [];
@@ -300,7 +307,7 @@ export default {
       }
       const result = {
         keys: header_fields.filter(value => {
-          return !this.table_options.dontShowCols.includes(value);
+          return !this.table_options.dontShowCols.includes(value) || !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
