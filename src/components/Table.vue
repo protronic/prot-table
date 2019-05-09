@@ -82,7 +82,7 @@ export default {
   name: "protVueTable",
   created(){
     for(let i in []){
-      this.dont_schow.push(i);
+      //this.dont_schow.push(i);
     }
   }, 
   data: function() {
@@ -117,6 +117,7 @@ export default {
         previousSorts: [],
         previousSort_dirs: []
       },
+      // dont_schow: [],
     };
   },
   props: {
@@ -306,7 +307,7 @@ export default {
       }
       const result = {
         keys: header_fields.filter(value => {
-          return !this.table_options.dontShowCols.includes(value) && !this.dont_schow.includes(value);
+          return !this.table_options.dontShowCols.includes(value) //|| !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
