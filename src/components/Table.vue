@@ -284,6 +284,7 @@ export default {
             : "auto";
         }
       } else {
+        
         header_fields = this.original_table_data
           .map(value => Object.keys(value))
           .reduce((collector, current) => {
@@ -295,6 +296,7 @@ export default {
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
         }
+        console.log('header_first', header_fields, display_names);
       }
       const result = {
         keys: header_fields.filter(value => {
