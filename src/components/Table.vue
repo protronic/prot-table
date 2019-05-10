@@ -55,15 +55,9 @@
         @input="input_changed($event, col, i)"
       >
     </div>
-<<<<<<< HEAD
-    <template v-for="(row, j) of display_table_data">
-      <div
-        v-for="(col, i) of get_header_list.keys"
-=======
     <template v-for="(row, j) in display_table_data">
       <template v-for="(col, i) in get_header_list.keys">
       <div
->>>>>>> 54d81c132e22d794b2c7bf2bfdbb5aec4b0ba14e
         :key="'row' + j + 'col' + i"
         :ref="'body'"
         :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"

@@ -27,6 +27,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table && cp public/web-component.html dist/index.html && cp public/data.json dist/data.json",
     "buildlib": "vue-cli-service build --mode production --dest dist/vue-component --target lib --name prot-table ./src/index.js",
+    "patch": "git add * && git commit -m '$1' && npm version patch && npm run buildlib && npm publish",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
