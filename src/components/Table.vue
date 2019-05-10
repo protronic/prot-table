@@ -286,6 +286,7 @@ export default {
       let fixed_widths = {};
       if (Object.keys(this.table_options.headerDef).length > 0) {
         for (let key in this.table_options.headerDef) {
+          console.log({key:key})
           header_fields.push(key);
           display_names[key] = this.table_options.headerDef[key].displayName
             ? this.table_options.headerDef[key].displayName
@@ -304,8 +305,10 @@ export default {
             }
             return collector;
           }, []);
+        console.log({header_fields: header_fields})
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
+          console.log({display_names: display_names})
         }
       }
       const result = {
@@ -315,6 +318,8 @@ export default {
         display: display_names,
         widths: fixed_widths
       };
+      console.log({result: result})
+
       if (this.table_options.showTimers) console.timeEnd("calc_header_time");
       return result;
     },
