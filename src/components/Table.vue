@@ -123,6 +123,7 @@ export default {
         previousSorts: [],
         previousSort_dirs: []
       },
+      debug = [],
       // dont_schow: [],
     };
   },
@@ -286,7 +287,7 @@ export default {
       let fixed_widths = {};
       if (Object.keys(this.table_options.headerDef).length > 0) {
         for (let key in this.table_options.headerDef) {
-          console.log({key:key})
+          this.data.debug.push({key:key})
           header_fields.push(key);
           display_names[key] = this.table_options.headerDef[key].displayName
             ? this.table_options.headerDef[key].displayName
@@ -305,10 +306,10 @@ export default {
             }
             return collector;
           }, []);
-        console.log({header_fields: header_fields})
+        this.data.debug.push({header_fields: header_fields})
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
-          console.log({display_names: display_names})
+          this.data.debug.push({display_names: display_names})
         }
       }
       const result = {
