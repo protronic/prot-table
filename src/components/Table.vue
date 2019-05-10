@@ -314,7 +314,7 @@ export default {
       }
       const result = {
         keys: header_fields.filter(value => {
-          return !this.table_options.dontShowCols.includes(value) && value.toString().slice(0, 8) !== 'function'//|| !this.dont_schow.includes(value);
+          return !this.table_options.dontShowCols.includes(value) && typeof value !== 'function'//|| !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
