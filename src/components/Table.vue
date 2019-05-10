@@ -123,7 +123,7 @@ export default {
         previousSorts: [],
         previousSort_dirs: []
       },
-      debug = [],
+      debug: [],
       // dont_schow: [],
     };
   },
