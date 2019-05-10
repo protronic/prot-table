@@ -287,7 +287,7 @@ export default {
       let fixed_widths = {};
       if (Object.keys(this.table_options.headerDef).length > 0) {
         for (let key in this.table_options.headerDef) {
-          this.debug.push({key:key})
+          // this.debug.push({key:key})
           header_fields.push(key);
           display_names[key] = this.table_options.headerDef[key].displayName
             ? this.table_options.headerDef[key].displayName
@@ -309,13 +309,13 @@ export default {
         this.debug.push({header_fields: header_fields})
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
-          this.debug.push({display_names: display_names})
+          // this.debug.push({display_names: display_names})
         }
       }
       const result = {
         keys: header_fields.filter(value => {
-          this.debug.push(value);
-          return !this.table_options.dontShowCols.includes(value) && typeof value !== 'function'//|| !this.dont_schow.includes(value);
+          // this.debug.push(value);
+          return !this.table_options.dontShowCols.includes(value) //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
