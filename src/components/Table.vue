@@ -209,11 +209,20 @@ export default {
 
         let formatter_applied = filter_applied;
         if (this.table_options.formatter) {
+          let all_formatter = {};
+          if(this.table_options.formatter['#all']){
+            for(let i = 0; i < this.get_header_list.keys.length; i++){
+              all_formatter[this.get_header_list.keys[i]] = (value, index, row) => (this.table_options.formatter['#all'](value, index, row));
+            }
+          }
+          for(let key in this.table_options.formatter){
+            all_formatter[key] = (value, index, row) => ( this.table_options.formatter[key](this.table_options.formatter['#all'](value, index, row), index, row) )
+          }
           formatter_applied = filter_applied.map((row, row_index) => {
             const result = {};
             for (let key in row) {
-              if (this.table_options.formatter[key]) {
-                result[key] = this.table_options.formatter[key](
+              if (all_formatter[key]) {
+                result[key] = all_formatter[key](
                   row[key],
                   row_index,
                   row
