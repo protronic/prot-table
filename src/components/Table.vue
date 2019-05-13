@@ -150,6 +150,11 @@ export default {
           "--filter-top-offset",
           `${this.$refs.header[0].offsetHeight}px`
         );
+        this.$set(
+          cssVars,
+          "--grid-template-columns",
+          `repeat(${this.display_table_data.length * 2 + 3} auto-fit, minmax(max-content, 100%))`
+        );
       }
       this.table_options = this.options;
     });
