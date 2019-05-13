@@ -146,7 +146,7 @@ export default {
     table_options: {
       immediate: true,
       handler(newValue, oldValue){
-        console.log(newValue)
+        console.error(newValue)
         let transformedOptions = typeof newValue === 'string' ? JSON.parse(newValue) : newValue;
         this.override_options(transformedOptions);
       }

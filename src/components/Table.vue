@@ -210,7 +210,8 @@ export default {
               if (this.table_options.formatter[key]) {
                 result[key] = this.table_options.formatter[key](
                   row[key],
-                  row_index
+                  row_index,
+                  row
                 );
               } else {
                 result[key] = row[key];
@@ -375,17 +376,20 @@ export default {
       }
     },
     compare_numbers(a, b) {
+      if ( a[this.sorted_data.currentSortKey] === undefined )
+        return this.sorted_data.currentSortDir === 'asc' ? 1 : -1;
+      if ( b[this.sorted_data.currentSortKey] === undefined )
+        return this.sorted_data.currentSortDir === 'asc' ? -1 : 1;
       return (
         Number(a[this.sorted_data.currentSortKey]) -
         Number(b[this.sorted_data.currentSortKey])
       );
     },
     compare_strings(a, b) {
-      if (
-        a[this.sorted_data.currentSortKey] === undefined ||
-        b[this.sorted_data.currentSortKey] === undefined
-      )
-        return undefined;
+      if ( a[this.sorted_data.currentSortKey] === undefined )
+        return this.sorted_data.currentSortDir === 'asc' ? 1 : -1;
+      if ( b[this.sorted_data.currentSortKey] === undefined )
+        return this.sorted_data.currentSortDir === 'asc' ? -1 : 1;
       const aValue = a[this.sorted_data.currentSortKey]
         .toString()
         .toLowerCase();

@@ -1,501 +1,508 @@
 [
   {
-    "_id": "5bbd026039520dabb1a14e06",
-    "index": 0,
-    "isActive": false,
-    "first": "Ruby",
-    "last": "Joyce",
-    "company": "INJOY",
-    "address": "224 Jefferson Street, Talpa, New Mexico, 9637"
+    "Artikelnummer": "0033000006",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "20.16",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd026056e4b8e1a7da0bdd",
-    "index": 1,
-    "isActive": false,
-    "first": "Ann",
-    "last": "Griffith",
-    "company": "INJOY",
-    "phone": "+1 (828) 486-2051",
-    "address": "739 Lott Place, Carrizo, Minnesota, 7189"
+    "Artikelnummer": "0033000008",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "12.00",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260a146249b8f00de76",
-    "index": 2,
-    "isActive": false,
-    "first": "Lott",
-    "last": "Hopper",
-    "company": "INJOY",
-    "phone": "+1 (917) 577-2513",
-    "address": "915 Plymouth Street, Harrison, Northern Mariana Islands, 2621"
+    "Artikelnummer": "0033000008",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "21.42"
   },
   {
-    "_id": "5bbd0260fd34cdb5b8194089",
-    "index": 3,
-    "isActive": false,
-    "first": "Stella",
-    "last": "Barrett",
-    "company": "INJOY",
-    "phone": "+1 (810) 570-2376",
-    "address": "543 Preston Court, Rosewood, District Of Columbia, 2387"
+    "Artikelnummer": "0603000129",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "7.73",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260065d724fb3138d97",
-    "index": 4,
-    "isActive": true,
-    "first": "Corrine",
-    "last": "Gill",
-    "company": "GALLAXIA",
-    "phone": "+1 (868) 414-3859",
-    "address": "362 Douglass Street, Carlton, Tennessee, 3450"
+    "Artikelnummer": "0603000205",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "101.97",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260dd9081be8870a966",
-    "index": 5,
-    "isActive": true,
-    "first": "Oneill",
-    "last": "Mcintosh",
-    "company": "QIMONK",
-    "phone": "+1 (917) 590-2977",
-    "address": "113 Strickland Avenue, Dargan, New Hampshire, 4979"
+    "Artikelnummer": "0603000241",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "25.64",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260c98d2e2363f22c4e",
-    "index": 6,
-    "isActive": false,
-    "first": "Carissa",
-    "last": "Stanton",
-    "company": "QIMONK",
-    "phone": "+1 (940) 416-2103",
-    "address": "450 Nevins Street, Goodville, Louisiana, 2470"
+    "Artikelnummer": "1001010002",
+    "Name1": "Scheuch GmbH",
+    "Einzelpreis": "792.07"
   },
   {
-    "_id": "5bbd02600979014f43551f11",
-    "index": 7,
-    "isActive": false,
-    "first": "Cantu",
-    "last": "Pena",
-    "company": "BUZZMAKER",
-    "phone": "+1 (820) 522-3354",
-    "address": "434 Banner Avenue, Boling, Wisconsin, 9074"
+    "Artikelnummer": "1001010002",
+    "Name1": "Scheuch LIGNO GmbH",
+    "Einzelpreis": "792.07",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd02604c8ab11709d05316",
-    "index": 8,
-    "isActive": true,
-    "first": "Robertson",
-    "last": "Lee",
-    "company": "OCTOCORE",
-    "phone": "+1 (995) 504-3933",
-    "address": "873 Norman Avenue, Dennard, Oregon, 7506"
+    "Artikelnummer": "1001010016",
+    "Name1": "Rundoor Türautomatik GmbH \u0026 Co. KG",
+    "Einzelpreis": "1089.74",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026071460f530e351b1a",
-    "index": 9,
-    "isActive": false,
-    "first": "Kennedy",
-    "last": "Hill",
-    "company": "ECLIPSENT",
-    "phone": "+1 (877) 586-2496",
-    "address": "121 Lincoln Terrace, Ryderwood, South Carolina, 3484"
+    "Artikelnummer": "1006000014",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "191.61",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026027b09b7a44b932e9",
-    "index": 10,
-    "isActive": true,
-    "first": "Deana",
-    "last": "Salazar",
-    "company": "QIMONK",
-    "phone": "+1 (951) 591-2553",
-    "address": "173 Fiske Place, Terlingua, Rhode Island, 609"
+    "Artikelnummer": "1006000014",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "360.65",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd02602d580823166396eb",
-    "index": 11,
-    "isActive": true,
-    "first": "Vega",
-    "last": "Patrick",
-    "company": "TECHADE",
-    "phone": "+1 (934) 579-2975",
-    "address": "460 Abbey Court, Robinette, South Dakota, 6684"
+    "Artikelnummer": "1006000030",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "85.98",
+    "Rabattsatz": "10.00"
   },
   {
-    "_id": "5bbd0260deac8ad9ffbdfe5f",
-    "index": 12,
-    "isActive": false,
-    "first": "Mara",
-    "last": "Frank",
-    "company": "FLYBOYZ",
-    "phone": "+1 (902) 496-3400",
-    "address": "110 Richards Street, Convent, Nevada, 5320"
+    "Artikelnummer": "1006000036",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "83.40",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260b6c63ca478b92c0d",
-    "index": 13,
-    "isActive": false,
-    "first": "Valenzuela",
-    "last": "Valencia",
-    "company": "ACCEL",
-    "phone": "+1 (849) 457-3894",
-    "address": "980 Times Placez, Ola, Kentucky, 8853"
+    "Artikelnummer": "1006000039",
+    "Name1": "Brandschutz und Sicherheitstechnik Podziemski",
+    "Einzelpreis": "154.83",
+    "Rabattsatz": "35.00"
   },
   {
-    "_id": "5bbd0260b13d392e710ce29d",
-    "index": 14,
-    "isActive": true,
-    "first": "Dixon",
-    "last": "Young",
-    "company": "TELLIFLY",
-    "phone": "+1 (933) 598-2330",
-    "address": "882 Atkins Avenue, Fairhaven, North Dakota, 1930"
+    "Artikelnummer": "1006000039",
+    "Name1": "Martin Roth",
+    "Einzelpreis": "154.83",
+    "Rabattsatz": "43.00"
   },
   {
-    "_id": "5bbd02602f5c757ad70edcb1",
-    "index": 15,
-    "isActive": true,
-    "first": "Stanley",
-    "last": "Tran",
-    "company": "SNORUS",
-    "phone": "+1 (830) 442-2789",
-    "address": "628 Lewis Avenue, Watchtower, Nebraska, 5579"
+    "Artikelnummer": "1006000039",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "68.73"
   },
   {
-    "_id": "5bbd026025bd7df4088698d8",
-    "index": 16,
-    "isActive": false,
-    "first": "Maryann",
-    "last": "Eaton",
-    "company": "HINWAY",
-    "phone": "+1 (896) 547-3892",
-    "address": "463 Lancaster Avenue, Greensburg, Delaware, 2896"
+    "Artikelnummer": "1006000046",
+    "Name1": "FEUERSCHUTZ TEC STUTTGART GmbH",
+    "Einzelpreis": "133.61",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026060813859ff62292d",
-    "index": 17,
-    "isActive": false,
-    "first": "Marisa",
-    "last": "Washington",
-    "company": "GENEKOM",
-    "phone": "+1 (806) 462-3421",
-    "address": "462 Monroe Street, Shawmut, Pennsylvania, 2220"
+    "Artikelnummer": "1006000046",
+    "Name1": "Franz Kaldewei GmbH \u0026 Co. KG",
+    "Einzelpreis": "133.61",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260bf7eb91ded1089fd",
-    "index": 18,
-    "isActive": false,
-    "first": "Bauer",
-    "last": "Estes",
-    "company": "BARKARAMA",
-    "phone": "+1 (959) 522-3444",
-    "address": "778 Clinton Avenue, Genoa, Missouri, 6758"
+    "Artikelnummer": "1006000047",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "117.94",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260f0d73cba4dfe9397",
-    "index": 19,
-    "isActive": false,
-    "first": "Ethel",
-    "last": "Frederick",
-    "company": "EXOSTREAM",
-    "phone": "+1 (876) 512-3420",
-    "address": "342 Gilmore Court, Frank, Illinois, 614"
+    "Artikelnummer": "1006000047",
+    "Name1": "Franz Kaldewei GmbH \u0026 Co. KG",
+    "Einzelpreis": "150.38",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260aaa65935ce9ecf1b",
-    "index": 20,
-    "isActive": true,
-    "first": "Arline",
-    "last": "Walsh",
-    "company": "RAMJOB",
-    "phone": "+1 (954) 553-2002",
-    "address": "221 Seaview Avenue, Cade, Virgin Islands, 994"
+    "Artikelnummer": "1006000049",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "205.97",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260769dfb8b569f5ad0",
-    "index": 21,
-    "isActive": false,
-    "first": "Adriana",
-    "last": "Bennett",
-    "company": "KIDGREASE",
-    "phone": "+1 (984) 453-3767",
-    "address": "936 Billings Place, Sanford, West Virginia, 6706"
+    "Artikelnummer": "1006000058",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "62.80",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026037d58dca01f99b3f",
-    "index": 22,
-    "isActive": true,
-    "first": "Coffey",
-    "last": "Holt",
-    "company": "SPACEWAX",
-    "phone": "+1 (974) 422-2871",
-    "address": "482 Lawton Street, Silkworth, Hawaii, 5505"
+    "Artikelnummer": "1006000060",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "117.94"
   },
   {
-    "_id": "5bbd026025eafcad37a15c69",
-    "index": 23,
-    "isActive": true,
-    "first": "Beasley",
-    "last": "Bailey",
-    "company": "NEXGENE",
-    "phone": "+1 (914) 432-2899",
-    "address": "259 Dekalb Avenue, Reno, North Carolina, 9991"
+    "Artikelnummer": "1006000061",
+    "Name1": "Apollo Deutschland  GmbH",
+    "Einzelpreis": "89.12"
   },
   {
-    "_id": "5bbd0260150ad52ac2125990",
-    "index": 24,
-    "isActive": true,
-    "first": "Mercedes",
-    "last": "Byrd",
-    "company": "WAZZU",
-    "phone": "+1 (893) 530-2869",
-    "address": "902 Ash Street, Freelandville, Texas, 4342"
+    "Artikelnummer": "1015000001",
+    "Name1": "Heydebreck GmbH",
+    "Einzelpreis": "92.43",
+    "Rabattsatz": "20.00"
   },
   {
-    "_id": "5bbd0260c15793f267e775dd",
-    "index": 25,
-    "isActive": true,
-    "first": "Earnestine",
-    "last": "Goff",
-    "company": "QUINEX",
-    "phone": "+1 (942) 492-3465",
-    "address": "193 Cumberland Walk, Vandiver, Palau, 7428"
+    "Artikelnummer": "1015000002",
+    "Name1": "clauss markisen Projekt GmbH",
+    "Einzelpreis": "326.38"
   },
   {
-    "_id": "5bbd0260803ddee0020f8fe3",
-    "index": 26,
-    "isActive": false,
-    "first": "Davenport",
-    "last": "Swanson",
-    "company": "QUILK",
-    "phone": "+1 (898) 553-2821",
-    "address": "406 Roebling Street, Yukon, Alaska, 791"
+    "Artikelnummer": "1015000002",
+    "Name1": "MHZ Hachtel GmbH \u0026 Co. KG",
+    "Einzelpreis": "336.17"
   },
   {
-    "_id": "5bbd026085187b337a09e432",
-    "index": 27,
-    "isActive": false,
-    "first": "Kramer",
-    "last": "Cote",
-    "company": "DEEPENDS",
-    "phone": "+1 (826) 457-3857",
-    "address": "689 Tiffany Place, Remington, Florida, 1905"
+    "Artikelnummer": "1015000006",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "288.40",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260731df90e60fa27e2",
-    "index": 28,
-    "isActive": true,
-    "first": "Mollie",
-    "last": "Browning",
-    "company": "QUALITERN",
-    "phone": "+1 (864) 592-2152",
-    "address": "894 Franklin Avenue, Celeryville, Montana, 4829"
+    "Artikelnummer": "1015000010",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "314.43",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd0260a858c709c77e05ef",
-    "index": 29,
-    "isActive": true,
-    "first": "Mcfarland",
-    "last": "Schmidt",
-    "company": "DRAGBOT",
-    "phone": "+1 (970) 478-2580",
-    "address": "100 Kossuth Place, Jenkinsville, Kansas, 7927"
+    "Artikelnummer": "1019000001",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "140.84",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260a863900816d281d7",
-    "index": 30,
-    "isActive": true,
-    "first": "Salinas",
-    "last": "Rivera",
-    "company": "PRIMORDIA",
-    "phone": "+1 (843) 553-2076",
-    "address": "646 Battery Avenue, Kiskimere, Iowa, 6687"
+    "Artikelnummer": "1019000008",
+    "Name1": "Franz Kaldewei GmbH \u0026 Co. KG",
+    "Einzelpreis": "111.39",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd02602c0bb8ecebb7f3eb",
-    "index": 31,
-    "isActive": true,
-    "first": "Gonzales",
-    "last": "Rollins",
-    "company": "MAGNEATO",
-    "phone": "+1 (895) 446-2864",
-    "address": "911 Roder Avenue, Coleville, Washington, 7596"
+    "Artikelnummer": "1019000009",
+    "Name1": "Franz Kaldewei GmbH \u0026 Co. KG",
+    "Einzelpreis": "118.81",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026039eb760c2655714d",
-    "index": 32,
-    "isActive": false,
-    "first": "Downs",
-    "last": "Beard",
-    "company": "RECRITUBE",
-    "phone": "+1 (893) 463-3403",
-    "address": "805 Greenpoint Avenue, Waterloo, Federated States Of Micronesia, 4368"
+    "Artikelnummer": "1019000012",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "120.93",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260b5b5fbf5099435bc",
-    "index": 33,
-    "isActive": false,
-    "first": "Bradley",
-    "last": "Ramsey",
-    "company": "KYAGORO",
-    "phone": "+1 (925) 569-3196",
-    "address": "959 Schermerhorn Street, Mansfield, American Samoa, 4016"
+    "Artikelnummer": "1028000001",
+    "Name1": "clauss markisen Projekt GmbH",
+    "Einzelpreis": "41.20",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd026021c463f7fa29c619",
-    "index": 34,
-    "isActive": false,
-    "first": "Chandler",
-    "last": "Perez",
-    "company": "DIGIFAD",
-    "phone": "+1 (942) 543-2877",
-    "address": "619 Bouck Court, Calvary, Connecticut, 4815"
+    "Artikelnummer": "1028000002",
+    "Name1": "FSC - Systemtechnik GmbH",
+    "Einzelpreis": "73.20",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd026048935aea1f444a36",
-    "index": 35,
-    "isActive": true,
-    "first": "Sexton",
-    "last": "Preston",
-    "company": "EDECINE",
-    "phone": "+1 (879) 427-3183",
-    "address": "966 Cadman Plaza, Bluetown, Idaho, 5347"
+    "Artikelnummer": "1028000002",
+    "Name1": "Scheuch GmbH",
+    "Einzelpreis": "48.31",
+    "Rabattsatz": "0.00"
   },
   {
-    "_id": "5bbd0260ea6e79693728aaa1",
-    "index": 36,
-    "isActive": true,
-    "first": "Fleming",
-    "last": "Durham",
-    "company": "ZOXY",
-    "phone": "+1 (882) 539-2179",
-    "address": "194 Bliss Terrace, Allendale, Vermont, 6084"
+    "Artikelnummer": "1028000002",
+    "Name1": "Scheuch LIGNO GmbH",
+    "Einzelpreis": "48.31"
   },
   {
-    "_id": "5bbd0260b45ecd6249aa9807",
-    "index": 37,
-    "isActive": false,
-    "first": "Glenna",
-    "last": "Branch",
-    "company": "QUANTASIS",
-    "phone": "+1 (960) 464-3824",
-    "address": "136 Heyward Street, Orick, Wyoming, 511"
+    "Artikelnummer": "1101000092",
+    "Name1": "Apollo Deutschland  GmbH",
+    "Einzelpreis": "15.86"
   },
   {
-    "_id": "5bbd02601e5a1ccd7cf6e1ab",
-    "index": 38,
-    "isActive": false,
-    "first": "Berta",
-    "last": "Norman",
-    "company": "BUZZWORKS",
-    "phone": "+1 (823) 588-2436",
-    "address": "592 Seagate Avenue, Gila, Arizona, 6844"
+    "Artikelnummer": "1105000003",
+    "Name1": "clauss markisen Projekt GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
   },
   {
-    "_id": "5bbd02609c8ebf6c6b125b27",
-    "index": 39,
-    "isActive": true,
-    "first": "Nancy",
-    "last": "Blevins",
-    "company": "PORTICA",
-    "phone": "+1 (958) 415-3111",
-    "address": "613 Franklin Street, Conestoga, Maryland, 8495"
+    "Artikelnummer": "1105000003",
+    "Name1": "MHZ Hachtel GmbH \u0026 Co. KG",
+    "Einzelpreis": "7.64"
   },
   {
-    "_id": "5bbd0260f470b9101b4454a7",
-    "index": 40,
-    "isActive": true,
-    "first": "Sofia",
-    "last": "Giles",
-    "company": "COMBOGEN",
-    "phone": "+1 (950) 447-2823",
-    "address": "948 Lake Street, Maplewood, Oklahoma, 2958"
+    "Artikelnummer": "1105000006",
+    "Name1": "CWS Safety GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
   },
   {
-    "_id": "5bbd026078362345c4e549f2",
-    "index": 41,
-    "isActive": false,
-    "first": "Elisa",
-    "last": "Humphrey",
-    "company": "UNIWORLD",
-    "phone": "+1 (860) 529-3835",
-    "address": "768 Oakland Place, Forestburg, Marshall Islands, 8709"
+    "Artikelnummer": "1105000007",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "2.40"
   },
   {
-    "_id": "5bbd0260092be3b4e5fd3643",
-    "index": 42,
-    "isActive": false,
-    "first": "Summers",
-    "last": "Banks",
-    "company": "ZIGGLES",
-    "phone": "+1 (973) 529-3677",
-    "address": "275 Barlow Drive, Masthope, Maine, 1512"
+    "Artikelnummer": "1105000008",
+    "Name1": "FUHRMANN GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "45.00"
   },
   {
-    "_id": "5bbd0260074cfc457aa18b93",
-    "index": 43,
-    "isActive": true,
-    "first": "Vaughn",
-    "last": "Reid",
-    "company": "ISOLOGIX",
-    "phone": "+1 (847) 523-3805",
-    "address": "768 Farragut Road, Gardners, Georgia, 4873"
+    "Artikelnummer": "1105000012",
+    "Name1": "INOVATOR Schnellauftore GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
   },
   {
-    "_id": "5bbd0260e206fcc85bc204bd",
-    "index": 44,
-    "isActive": true,
-    "first": "Long",
-    "last": "Brown",
-    "company": "TECHTRIX",
-    "phone": "+1 (825) 408-3618",
-    "address": "848 Grove Street, Heil, Alabama, 3368"
+    "Artikelnummer": "1105000014",
+    "Name1": "Rundoor Türautomatik GmbH \u0026 Co. KG",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd02602269d107d9299f7d",
-    "index": 45,
-    "isActive": false,
-    "first": "Crane",
-    "last": "Tucker",
-    "company": "EVENTIX",
-    "phone": "+1 (877) 456-3715",
-    "address": "854 Locust Street, Lafferty, Utah, 2150"
+    "Artikelnummer": "1105000015",
+    "Name1": "Söhnchen GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "36.00"
   },
   {
-    "_id": "5bbd026027f40d91f3d63028",
-    "index": 46,
-    "isActive": true,
-    "first": "Cora",
-    "last": "Shannon",
-    "company": "ZILLIDIUM",
-    "phone": "+1 (854) 425-2204",
-    "address": "370 Nixon Court, Martell, Mississippi, 4630"
+    "Artikelnummer": "1105000016",
+    "Name1": "ABS Weiler GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "30.00"
   },
   {
-    "_id": "5bbd02607105c627c376c727",
-    "index": 47,
-    "isActive": true,
-    "first": "Jackie",
-    "last": "Wade",
-    "company": "NIKUDA",
-    "phone": "+1 (978) 525-2840",
-    "address": "396 Glenmore Avenue, Escondida, Ohio, 6176"
+    "Artikelnummer": "1105000017",
+    "Name1": "Käfer Stahlhandel GmbH \u0026 Co.KG",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "45.00"
   },
   {
-    "_id": "5bbd0260a4c33ec41fa63740",
-    "index": 48,
-    "isActive": true,
-    "first": "Kathy",
-    "last": "Harrison",
-    "company": "BIOLIVE",
-    "phone": "+1 (942) 469-3834",
-    "address": "609 Cozine Avenue, Why, California, 6801"
+    "Artikelnummer": "1105000018",
+    "Name1": "TOTAL Feuerschutz GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
   },
   {
-    "_id": "5bbd0260f4f5c057e570e09a",
-    "index": 49,
-    "isActive": true,
-    "first": "Tamara",
-    "last": "Hooper",
-    "company": "ARTIQ",
-    "phone": "+1 (867) 408-2376",
-    "address": "880 Henry Street, Choctaw, Indiana, 3483"
+    "Artikelnummer": "1105000018",
+    "Name1": "TOTAL Feuerschutz GmbH",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "40.00"
+  },
+  {
+    "Artikelnummer": "1105000020",
+    "Name1": "Teckentrup GmbH \u0026 Co.KG",
+    "Einzelpreis": "7.42"
+  },
+  {
+    "Artikelnummer": "1105000022",
+    "Name1": "Apollo Deutschland  GmbH",
+    "Einzelpreis": "2.54"
+  },
+  {
+    "Artikelnummer": "1105000023",
+    "Name1": "Hoefnagels Branddeuren B.V.",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "30.00"
+  },
+  {
+    "Artikelnummer": "1105000024",
+    "Name1": "BTL Brandschutz Technik GmbH Leipzig",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
+  },
+  {
+    "Artikelnummer": "1105000025",
+    "Name1": "Mai Sicherheitstechnik GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "35.00"
+  },
+  {
+    "Artikelnummer": "1105000029",
+    "Name1": "Cosmos Feuerlöschgerätebau GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "40.00"
+  },
+  {
+    "Artikelnummer": "1105000030",
+    "Name1": "Hill Brandschutz-Technik",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "35.00"
+  },
+  {
+    "Artikelnummer": "1105000031",
+    "Name1": "Schönmann \u0026 Dotzauer Brandschutztechnik GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "42.00"
+  },
+  {
+    "Artikelnummer": "1105000032",
+    "Name1": "Brandschutzservice Spahn GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "35.00"
+  },
+  {
+    "Artikelnummer": "1105000034",
+    "Name1": "FEUERSCHUTZ TEC STUTTGART GmbH",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "20.00"
+  },
+  {
+    "Artikelnummer": "1105000035",
+    "Name1": "Robert Rothe Feuerschutz GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "35.00"
+  },
+  {
+    "Artikelnummer": "1105000035",
+    "Name1": "Schütz Bauservice GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "38.00"
+  },
+  {
+    "Artikelnummer": "1105000036",
+    "Name1": "Kluge Brandschutz GmbH",
+    "Einzelpreis": "7.42"
+  },
+  {
+    "Artikelnummer": "1105000037",
+    "Name1": "Planer Feuerschutz GmbH \u0026 Co. KG",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "20.00"
+  },
+  {
+    "Artikelnummer": "1105000038",
+    "Name1": "K+K Isoliertechnik GmbH",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "15.00"
+  },
+  {
+    "Artikelnummer": "1105000042",
+    "Name1": "Ralf Steude Feuerschutz",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "30.00"
+  },
+  {
+    "Artikelnummer": "1105000047",
+    "Name1": "BTS Müller \u0026 Olschok GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "45.00"
+  },
+  {
+    "Artikelnummer": "1105000048",
+    "Name1": "Bretz \u0026 Hufer Gebäudesystemtechnik GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "45.00"
+  },
+  {
+    "Artikelnummer": "1105000049",
+    "Name1": "Rudolph \u0026 Umbescheidt GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "30.00"
+  },
+  {
+    "Artikelnummer": "1105000052",
+    "Name1": "Heydebreck GmbH",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "20.00"
+  },
+  {
+    "Artikelnummer": "1105000055",
+    "Name1": "Siemens AG",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "25.00"
+  },
+  {
+    "Artikelnummer": "1105000056",
+    "Name1": "Martin Roth",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "40.00"
+  },
+  {
+    "Artikelnummer": "1105000060",
+    "Name1": "BSH Tür- und Torautomatik GmbH",
+    "Einzelpreis": "7.42",
+    "Rabattsatz": "35.00"
+  },
+  {
+    "Artikelnummer": "1105000061",
+    "Name1": "Hoefnagels Branddeuren B.V.",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "30.00"
+  },
+  {
+    "Artikelnummer": "1105000064",
+    "Name1": "DICTATOR Technik GmbH",
+    "Einzelpreis": "7.64",
+    "Rabattsatz": "41.00"
+  },
+  {
+    "Artikelnummer": "1201000001",
+    "Name1": "A. Schröder",
+    "Einzelpreis": "52.19",
+    "Rabattsatz": "0.00"
+  },
+  {
+    "Artikelnummer": "1201000001",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "39.25"
+  },
+  {
+    "Artikelnummer": "1201000002",
+    "Name1": "A. Schröder",
+    "Einzelpreis": "44.24",
+    "Rabattsatz": "0.00"
+  },
+  {
+    "Artikelnummer": "1201000002",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "34.97"
+  },
+  {
+    "Artikelnummer": "1203000004",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "27.15"
+  },
+  {
+    "Artikelnummer": "1204000001",
+    "Name1": "A. Schröder",
+    "Einzelpreis": "6.37",
+    "Rabattsatz": "0.00"
+  },
+  {
+    "Artikelnummer": "1204000001",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "3.72"
+  },
+  {
+    "Artikelnummer": "1204000005",
+    "Name1": "A. Schröder",
+    "Einzelpreis": "6.37",
+    "Rabattsatz": "0.00"
+  },
+  {
+    "Artikelnummer": "1204000005",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "3.83"
+  },
+  {
+    "Artikelnummer": "1205000002",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "4.68"
+  },
+  {
+    "Artikelnummer": "1205000003",
+    "Name1": "Wassermann GmbH \u0026 Co. KG",
+    "Einzelpreis": "9.87"
+  },
+  {
+    "Artikelnummer": "1305000006",
+    "Name1": "Lobeco Fire + Security B.V.",
+    "Einzelpreis": "125.13"
+  },
+  {
+    "Artikelnummer": "1305000008",
+    "Name1": "Heydebreck GmbH",
+    "Einzelpreis": "510.63",
+    "Rabattsatz": "20.00"
   }
 ]
