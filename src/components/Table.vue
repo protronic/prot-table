@@ -216,7 +216,7 @@ export default {
             }
           }
           for(let key in this.table_options.formatter){
-            all_formatter[key] = (value, index, row) => ( this.table_options.formatter[key](this.table_options.formatter['#all'](value, index, row), index, row) )
+            all_formatter[key] = (value, index, row) => ( this.table_options.formatter['#all'](this.table_options.formatter[key](value, index, row), index, row) )
           }
           formatter_applied = filter_applied.map((row, row_index) => {
             const result = {};
@@ -467,11 +467,12 @@ export default {
   position: relative;
   grid-template-rows: auto;
   grid-template-columns: var(--grid-template-columns);
+  grid-gap: var(--grid-gap-row) var(--grid-gap-column);
   box-sizing: border-box;
   border: var(--table-border);
   align-content: start;
   font-size: var(--table-font-size);
-  background: var(--header-background);
+  background: var(--grid-gap-color);
 }
 
 .header_field {

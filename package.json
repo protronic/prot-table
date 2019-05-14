@@ -28,6 +28,7 @@
     "build": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table && cp public/web-component.html dist/index.html && cp public/data.json dist/data.json",
     "buildlib": "vue-cli-service build --mode production --dest dist/vue-component --target lib --name prot-table ./src/index.js",
     "buildwc": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table ./src/index.js",
+    "watchwc": "vue-cli-service build --mode production --dest dist/web-component --target wc --name prot-table ./src/index.js --watch",
     "patch": "git add * && git commit && git push && npm version patch && npm run buildwc && npm publish",
     "lint": "vue-cli-service lint"
   },

@@ -184,11 +184,16 @@ export default {
   --header-font-color: #2c3e50;
   --body-even-font-color: #2c3e50;
   --body-odd-font-color: #2c3e50;
+  --grid-gap-color: lightgray;
 
   /* Border: */
-  --table-border: 1px solid lightgray;
+  /* --table-border: 1px solid lightgray;
   --header-field-border: 1px solid lightgray;
-  --body-field-border: 1px solid lightgray;
+  --body-field-border: 1px solid lightgray; */
+
+  --table-border: 1px solid lightgray;
+  --header-field-border: none;
+  --body-field-border: none;
 
   /* Font: */
   --table-font-family: 'Avenir', Helvetica, Arial, sans-serif; 
@@ -205,6 +210,8 @@ export default {
   /* Grid: */
   --grid-template-columns: repeat(auto-fit, minmax(max-content, 100%));
   --grid-template-rows: repeat(auto-fill, minmax(max-content, 100%));
+  --grid-gap-column: 1px;
+  --grid-gap-row: 1px;
   --grid-header-row: 1;
   --grid-resize-row: 2;
   --grid-filter-row: 3;
