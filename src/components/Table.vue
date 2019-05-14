@@ -222,11 +222,19 @@ export default {
             const result = {};
             for (let key in row) {
               if (all_formatter[key]) {
-                result[key] = all_formatter[key](
-                  row[key],
-                  row_index,
-                  row
-                );
+                try{
+                  result[key] = all_formatter[key](
+                    row[key],
+                    row_index,
+                    row
+                  );
+                }
+                catch(e){
+                  if(e instanceof TypeError){  
+                    console.log('caught error.')
+                    all_formatter[key] = (value, index, row) => (this.table_options.formatter[key](value, index, row));
+                  }
+                }
               } else {
                 result[key] = row[key];
               }
@@ -461,6 +469,29 @@ export default {
 };
 </script>
 
+<style>
+  #prot_table a:link {
+    color: var(--table-link-color);
+    text-decoration: var(--table-link-text-deco);
+  }
+
+  #prot_table a:active {
+    color: var(--table-link-color);
+    text-decoration: var(--table-link-text-deco);
+  }
+
+  #prot_table a:hover {
+    color: var(--table-link-hover-color);
+    text-decoration: var(--table-link-hover-text-deco);
+  }
+
+
+  #prot_table a:visited {
+    color: var(--table-link-color);
+    text-decoration: var(--table-link-text-deco);
+  }
+</style>
+
 <style scoped>
 #prot_table {
   display: grid;
@@ -510,6 +541,7 @@ export default {
   left: 0px;
   position: sticky;
   box-sizing: border-box;
+  border: var(--filter-field-border);
 }
 
 .filter_field input {

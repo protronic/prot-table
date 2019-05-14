@@ -34,8 +34,8 @@
           }],
           'colStyles': {'address': {'text-align': 'right'}},
           'formatter': {
-            '#all': (value) => (`<span style="color: green">${value}</span>`),
-            'Artikelnummer': (value) => (`<span style="color: red">${value}</span>`),
+            // '#all': (value) => (`<span style="color: green">${value}</span>`),
+            'Artikelnummer': (value) => (`<a href="test">${value}</a>`),
             'isActive': (value) => ((value) ? 'yes' : 'no'),
             'address': (value) => ((value) ? value.split(',').map( token => ((token.match(/\s[0-9]{3,4}/gm) ? `<span style="color: red;">${token}</span>` : token))).join(',') : '')
           },

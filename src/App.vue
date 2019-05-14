@@ -185,6 +185,12 @@ export default {
   --body-even-font-color: #2c3e50;
   --body-odd-font-color: #2c3e50;
   --grid-gap-color: lightgray;
+  
+  /* Link: */
+  --table-link-color: #23527c;
+  --table-link-hover-color: #23527c;
+  --table-link-text-deco: none;
+  --table-link-hover-text-deco: underline;
 
   /* Border: */
   /* --table-border: 1px solid lightgray;
@@ -193,6 +199,7 @@ export default {
 
   --table-border: 1px solid lightgray;
   --header-field-border: none;
+  --filter-field-border: 1px solid lightgray;
   --body-field-border: none;
 
   /* Font: */
