@@ -472,23 +472,23 @@ export default {
 <style>
   #prot_table a:link {
     color: var(--table-link-color);
-    text-decoration: var(--table-link-text-deco);
+    text-decoration: var(--table-link-deco);
   }
 
   #prot_table a:active {
-    color: var(--table-link-color);
-    text-decoration: var(--table-link-text-deco);
+    color: var(--table-active-color);
+    text-decoration: var(--table-acitve-deco);
   }
 
   #prot_table a:hover {
-    color: var(--table-link-hover-color);
-    text-decoration: var(--table-link-hover-text-deco);
+    color: var(--table-hover-color);
+    text-decoration: var(--table-hover-deco);
   }
 
 
   #prot_table a:visited {
-    color: var(--table-link-color);
-    text-decoration: var(--table-link-text-deco);
+    color: var(--table-visited-color);
+    text-decoration: var(--table-visited-deco);
   }
 </style>
 

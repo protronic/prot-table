@@ -187,10 +187,16 @@ export default {
   --grid-gap-color: lightgray;
   
   /* Link: */
-  --table-link-color: #23527c;
-  --table-link-hover-color: #23527c;
-  --table-link-text-deco: none;
-  --table-link-hover-text-deco: underline;
+  --table-link-color: #337ab7;
+  --table-active-color: #337ab7;
+  --table-hover-color: #23527c;
+  --table-visited-color: #23527c;
+
+
+  --table-link-deco: none;
+  --table-active-deco: none;
+  --table-hover-deco: underline;
+  --table-visited-deco: none;
 
   /* Border: */
   /* --table-border: 1px solid lightgray;
