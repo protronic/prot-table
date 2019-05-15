@@ -35,6 +35,7 @@ export default {
         "showTimers": true,
         "headerDef": {},
         "resizable": false,
+        "routing": true
       }
     };
   },

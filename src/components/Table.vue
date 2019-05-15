@@ -11,7 +11,6 @@
       table_options.tableStyles, 
       cssVariables
     ]"
-    
   >
     <div
       v-for="(key, i) of get_header_list.keys"
@@ -57,24 +56,20 @@
     </div>
     <template v-for="(row, j) in display_table_data">
       <template v-for="(col, i) in get_header_list.keys">
-      <div
-        :key="'row' + j + 'col' + i"
-        :ref="'body'"
-        :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
-        :style="[].concat([
+        <div
+          :key="'row' + j + 'col' + i"
+          :ref="'body'"
+          :class="['body_field', 'body_field_row_' + j, 'body_field_col_' + i, j % 2 === 0 ? 'even_row' : 'odd_row']"
+          :style="[].concat([
             {'grid-row': j + 4}, 
             table_options.bodyStyles, 
             (table_options.colStyles[col]) ? (table_options.colStyles[col]) : {},
           ], 
           table_options.rowStyles.map( value => (value.check_row(display_table_data[j], j) ? value.styles : {}))
         )"
-        v-html="row[col]"
-      ></div>
-      <div
-        :key="'row_details' + j + '_col' + i"
-        :ref="'detail'"
-        :class="['details_field']"
-      ></div>
+          v-html="row[col]"
+        ></div>
+        <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
   </div>
@@ -83,14 +78,16 @@
 <script>
 import Vue from "vue";
 import debounce from "lodash.debounce";
+import { Promise } from 'q';
+import { setTimeout } from 'timers';
 
 export default {
   name: "protVueTable",
-  created(){
-    for(let i in []){
+  created() {
+    for (let i in []) {
       //this.dont_schow.push(i);
     }
-  }, 
+  },
   data: function() {
     return {
       filter_inputs: {},
@@ -113,7 +110,8 @@ export default {
         },
         showTimers: true,
         headerDef: {},
-        resizable: false
+        resizable: false,
+        routing: true
       },
       original_table_data: [],
       sorted_data: {
@@ -123,7 +121,7 @@ export default {
         previousSorts: [],
         previousSort_dirs: []
       },
-      debug: [],
+      debug: []
       // dont_schow: [],
     };
   },
@@ -153,7 +151,8 @@ export default {
         this.$set(
           cssVars,
           "--grid-template-columns",
-          `repeat(${this.display_table_data.length * 2 + 3} auto-fit, minmax(max-content, 100%))`
+          `repeat(${this.display_table_data.length * 2 +
+            3} auto-fit, minmax(max-content, 100%))`
         );
       }
       this.table_options = this.options;
@@ -210,29 +209,34 @@ export default {
         let formatter_applied = filter_applied;
         if (this.table_options.formatter) {
           let all_formatter = {};
-          if(this.table_options.formatter['#all']){
-            for(let i = 0; i < this.get_header_list.keys.length; i++){
-              all_formatter[this.get_header_list.keys[i]] = (value, index, row) => (this.table_options.formatter['#all'](value, index, row));
+          if (this.table_options.formatter["#all"]) {
+            for (let i = 0; i < this.get_header_list.keys.length; i++) {
+              all_formatter[this.get_header_list.keys[i]] = (
+                value,
+                index,
+                row
+              ) => this.table_options.formatter["#all"](value, index, row);
             }
           }
-          for(let key in this.table_options.formatter){
-            all_formatter[key] = (value, index, row) => ( this.table_options.formatter['#all'](this.table_options.formatter[key](value, index, row), index, row) )
+          for (let key in this.table_options.formatter) {
+            all_formatter[key] = (value, index, row) =>
+              this.table_options.formatter["#all"](
+                this.table_options.formatter[key](value, index, row),
+                index,
+                row
+              );
           }
           formatter_applied = filter_applied.map((row, row_index) => {
             const result = {};
             for (let key in row) {
               if (all_formatter[key]) {
-                try{
-                  result[key] = all_formatter[key](
-                    row[key],
-                    row_index,
-                    row
-                  );
-                }
-                catch(e){
-                  if(e instanceof TypeError){  
-                    console.log('caught error.')
-                    all_formatter[key] = (value, index, row) => (this.table_options.formatter[key](value, index, row));
+                try {
+                  result[key] = all_formatter[key](row[key], row_index, row);
+                } catch (e) {
+                  if (e instanceof TypeError) {
+                    console.log("caught error.");
+                    all_formatter[key] = (value, index, row) =>
+                      this.table_options.formatter[key](value, index, row);
                   }
                 }
               } else {
@@ -320,7 +324,6 @@ export default {
             : "auto";
         }
       } else {
-        
         header_fields = this.original_table_data
           .map(value => Object.keys(value))
           .reduce((collector, current) => {
@@ -329,7 +332,7 @@ export default {
             }
             return collector;
           }, []);
-        this.debug.push({header_fields: header_fields})
+        this.debug.push({ header_fields: header_fields });
         for (let i = 0; i < header_fields.length; i++) {
           display_names[header_fields[i]] = header_fields[i];
           // this.debug.push({display_names: display_names})
@@ -338,12 +341,12 @@ export default {
       const result = {
         keys: header_fields.filter(value => {
           // this.debug.push(value);
-          return !this.table_options.dontShowCols.includes(value) //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
+          return !this.table_options.dontShowCols.includes(value); //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths
       };
-      console.log({result: result})
+      console.log({ result: result });
 
       if (this.table_options.showTimers) console.timeEnd("calc_header_time");
       return result;
@@ -359,7 +362,7 @@ export default {
     }
   },
   methods: {
-    resizeClick(event, col, ind){
+    resizeClick(event, col, ind) {
       // if(!col && !ind){
       //   for (let i in this.$refs.resize) {
       //     this.$refs.resize[i].style.width = "auto";
@@ -368,7 +371,6 @@ export default {
       // else{
       this.$refs.resize[ind].style.width = this.$refs.header[ind].offsetWidth;
       // }
-      
     },
     input_changed(event, col, col_index) {
       try {
@@ -391,28 +393,27 @@ export default {
       }
     },
     sort_action(event, sort_key) {
+      this.undebounced_sort_action(event, sort_key);
+    },
+    undebounced_sort_action(e, sort_key){
       try {
-        this.sort_data(sort_key, this.get_sortability[sort_key]);
+        this.sort_data(sort_key, this.get_sortability[sort_key], event === undefined ? false : true);
       } catch (err) {
         console.error(err);
       }
     },
     compare_numbers(a, b) {
-      if ( a[this.sorted_data.currentSortKey] === undefined )
-        return 1;
-      if ( b[this.sorted_data.currentSortKey] === undefined )
-        return -1;
-      return (
-        this.sorted_data.currentSortDir === 'asc' ? 
-          Number(a[this.sorted_data.currentSortKey]) - Number(b[this.sorted_data.currentSortKey]) :
-          Number(b[this.sorted_data.currentSortKey]) - Number(a[this.sorted_data.currentSortKey]) 
-      );
+      if (a[this.sorted_data.currentSortKey] === undefined) return 1;
+      if (b[this.sorted_data.currentSortKey] === undefined) return -1;
+      return this.sorted_data.currentSortDir === "asc"
+        ? Number(a[this.sorted_data.currentSortKey]) -
+            Number(b[this.sorted_data.currentSortKey])
+        : Number(b[this.sorted_data.currentSortKey]) -
+            Number(a[this.sorted_data.currentSortKey]);
     },
     compare_strings(a, b) {
-      if ( a[this.sorted_data.currentSortKey] === undefined )
-        return 1;
-      if ( b[this.sorted_data.currentSortKey] === undefined )
-        return -1;
+      if (a[this.sorted_data.currentSortKey] === undefined) return 1;
+      if (b[this.sorted_data.currentSortKey] === undefined) return -1;
       const aValue = a[this.sorted_data.currentSortKey]
         .toString()
         .toLowerCase();
@@ -420,19 +421,19 @@ export default {
         .toString()
         .toLowerCase();
       if (aValue > bValue) {
-        return this.sorted_data.currentSortDir === 'asc' ? 1 : -1;
+        return this.sorted_data.currentSortDir === "asc" ? 1 : -1;
       } else if (aValue < bValue) {
-        return this.sorted_data.currentSortDir === 'asc' ? -1 : 1;
+        return this.sorted_data.currentSortDir === "asc" ? -1 : 1;
       } else if (aValue === bValue) {
         return 0;
       }
     },
-    sort_data(sort_key, sort_type) {
+    sort_data(sort_key, sort_type, routeUrl) {
       if (this.table_options.showTimers) console.time("sort_time");
       const previous_key = this.sorted_data.currentSortKey;
       const previous_dir = this.sorted_data.currentSortDir;
-      if (previous_key) this.sorted_data.previousSorts.push(previous_key);
-      if (previous_dir) this.sorted_data.previousSort_dirs.push(previous_dir);
+      if (previous_key && previous_key !== sort_key) this.sorted_data.previousSorts.push(previous_key);
+      if (previous_dir && previous_key !== sort_key) this.sorted_data.previousSort_dirs.push(previous_dir);
       this.sorted_data.currentSortKey = sort_key;
       this.sorted_data.currentSortDir =
         sort_key === previous_key
@@ -440,6 +441,22 @@ export default {
             ? "desc"
             : "asc"
           : "asc";
+      // if(this.sorted_data.currentSortKey === this.sorted_data.previousSorts.slice(-1)[0]){
+      //   this.sorted_data.previousSorts = this.sorted_data.previousSorts.slice(0, -1);
+      //   this.sorted_data.previousSort_dirs = this.sorted_data.previousSort_dirs.slice(0, -2).concat(this.sorted_data.previousSort_dirs.slice(-1)[0])
+      // }
+      console.log([].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey))
+      console.log([].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir))
+      if (this.table_options.routing && routeUrl)
+        this.set_url_parameter(
+          "sortBy",
+          [].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey)
+            .slice(-2)
+            .map((val, ind) => ({
+              col: val,
+              dir: [].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir).slice(-2)[ind]
+            }))
+        );
       if (typeof sort_type !== "function") {
         this.sorted_data.data = this.sorted_data.data
           .slice()
@@ -455,12 +472,69 @@ export default {
       //   this.sorted_data.data.reverse();
       // }
       if (this.table_options.showTimers) console.timeEnd("sort_time");
+    },
+    set_url_parameter(param, value) {
+      let resultURI = "";
+      let url = location.href;
+      if (url.includes("?")) {
+        let match = url
+          .split("?")
+          .slice(1)
+          .join("?")
+          .split("&")
+          .reduce((col, cur) => (cur.split("=")[0] === param ? cur : col), "");
+        resultURI =
+          match === ""
+            ? `${url}&${param}=${JSON.stringify(value)}`
+            : url.replace(match, `${param}=${JSON.stringify(value)}`);
+      } else {
+        resultURI = `${url}?${param}=${JSON.stringify(value)}`;
+      }
+
+      history.pushState(null, "", encodeURI(resultURI));
+    },
+    get_url_parameter(param) {
+      let result = { key: param, value: "" };
+      let url = location.href;
+
+      try {
+        let value = decodeURI(url
+          .split("?")
+          .slice(1)
+          .join("?")
+          .split("&")
+          .reduce(
+            (col, cur) =>
+              cur.split("=")[0] === param ? cur.split("=")[1] : col,
+            ""
+          ));
+        result.value = JSON.parse(value);
+      } catch (e) {
+        result.notFound = true;
+      }
+
+      return result;
     }
   },
   watch: {
     table_data: function(newValue) {
       this.original_table_data = newValue;
       Vue.set(this.sorted_data, "data", newValue);
+      console.log('---- data changed')
+      let sortBy = this.get_url_parameter('sortBy');
+      console.log(sortBy)
+      console.log(this.sorted_data.data)
+      if(!sortBy.notFound){
+        for(let i = 0; i < sortBy.value.length; i++){
+          if(sortBy.value[i].dir === 'desc'){
+            this.undebounced_sort_action(undefined, sortBy.value[i].col)
+            this.undebounced_sort_action(undefined, sortBy.value[i].col)
+          }
+          else{
+            this.undebounced_sort_action(undefined, sortBy.value[i].col)
+          }
+        }
+      }
     },
     options: function(newValue) {
       this.table_options = newValue;
@@ -470,26 +544,25 @@ export default {
 </script>
 
 <style>
-  #prot_table a:link {
-    color: var(--table-link-color);
-    text-decoration: var(--table-link-deco);
-  }
+#prot_table a:link {
+  color: var(--table-link-color);
+  text-decoration: var(--table-link-deco);
+}
 
-  #prot_table a:active {
-    color: var(--table-active-color);
-    text-decoration: var(--table-acitve-deco);
-  }
+#prot_table a:active {
+  color: var(--table-active-color);
+  text-decoration: var(--table-acitve-deco);
+}
 
-  #prot_table a:hover {
-    color: var(--table-hover-color);
-    text-decoration: var(--table-hover-deco);
-  }
+#prot_table a:hover {
+  color: var(--table-hover-color);
+  text-decoration: var(--table-hover-deco);
+}
 
-
-  #prot_table a:visited {
-    color: var(--table-visited-color);
-    text-decoration: var(--table-visited-deco);
-  }
+#prot_table a:visited {
+  color: var(--table-visited-color);
+  text-decoration: var(--table-visited-deco);
+}
 </style>
 
 <style scoped>
@@ -523,7 +596,7 @@ export default {
 
 .resize_field {
   grid-row: var(--grid-resize-row);
-  content: ' ';
+  content: " ";
   min-height: 0.6em;
   overflow: var(--header-overflow);
   resize: var(--header-resize);
