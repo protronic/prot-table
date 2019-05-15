@@ -397,7 +397,8 @@ export default {
     },
     undebounced_sort_action(e, sort_key){
       try {
-        this.sort_data(sort_key, this.get_sortability[sort_key], event === undefined ? false : true);
+        console.log(e)
+        this.sort_data(sort_key, this.get_sortability[sort_key], e === undefined ? false : true);
       } catch (err) {
         console.error(err);
       }
