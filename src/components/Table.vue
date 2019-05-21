@@ -72,6 +72,14 @@
         <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
+    <div id="footer" ref="footer" v-show="total_pages > 1" @click="logCurrent">
+      <div class="firstPage pageEnd" @click="current_page = 0">&lt;&lt;</div>
+      <div class="previousPage pageSelect" @click="current_page = Math.max(current_page - 1, 0)">&lt;</div>
+      <div v-for="(e, i) in [...Array(Math.min(total_pages, 9))]" :key="i" class="pageSelect" @click="current_page = i">{{i + 1}}</div>
+      <div v-show="total_pages > 9" class="pageSelect">..</div>
+      <div class="nextPage pageSelect" @click="current_page = Math.min(current_page + 1, total_pages - 1)">&gt;</div>
+      <div class="lastPage pageEnd" @click="current_page = total_pages - 1">&gt;&gt;</div>
+    </div>
   </div>
 </template>
 
@@ -111,7 +119,11 @@ export default {
         showTimers: true,
         headerDef: {},
         resizable: false,
-        routing: true
+        routing: true,
+        pagination: {
+          activ: true,
+          rows: 100
+        }
       },
       original_table_data: [],
       sorted_data: {
@@ -121,8 +133,10 @@ export default {
         previousSorts: [],
         previousSort_dirs: []
       },
-      debug: []
+      debug: [],
       // dont_schow: [],
+      current_page: 0,
+      total_pages: 0
     };
   },
   props: {
@@ -152,8 +166,19 @@ export default {
           cssVars,
           "--grid-template-columns",
           `repeat(${this.display_table_data.length * 2 +
-            3} auto-fit, minmax(max-content, 100%))`
+            4} auto-fit, minmax(max-content, 100%))`
         );
+        this.$set(
+          cssVars,
+          "--grid-footer-area",
+          `${this.display_table_data.length * 2 + 3} / 1 / ${this.display_table_data.length * 2 + 3} / ${this.get_header_list.keys.length + 1}`
+        );
+        if(this.table_options.pagination && this.table_options.pagination.activ){
+          this.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.rows)
+        }
+        else{
+          this.total_pages = 0;
+        }
       }
       this.table_options = this.options;
     });
@@ -248,7 +273,11 @@ export default {
         }
         if (this.table_options.showTimers)
           console.timeEnd("applying_formatter");
-        return formatter_applied;
+        let paginated = formatter_applied;
+        if(this.table_options.pagination && this.table_options.pagination.activ && this.total_pages > 0){
+          paginated = formatter_applied.filter( (value, index) => (index > (this.current_page * this.table_options.pagination.rows) && (index <= (this.current_page * this.table_options.pagination.rows) + this.table_options.pagination.rows) ? true : false));
+        }
+        return paginated;
       } else {
         return [];
       }
@@ -373,7 +402,11 @@ export default {
       // }
     },
     input_changed(event, col, col_index) {
+      this.undebounced_input_changed(event, col, col_index);
+    },
+    undebounced_input_changed(event, col, col_index){
       try {
+        console.log('---- input change detected')
         let value = this.$refs.input[col_index].value;
         this.$set(
           this.filter_inputs,
@@ -515,6 +548,9 @@ export default {
       }
 
       return result;
+    },
+    logCurrent(){
+      console.log(this.current_page)
     }
   },
   watch: {
@@ -523,8 +559,6 @@ export default {
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
       let sortBy = this.get_url_parameter('sortBy');
-      console.log(sortBy)
-      console.log(this.sorted_data.data)
       if(!sortBy.notFound){
         for(let i = 0; i < sortBy.value.length; i++){
           if(sortBy.value[i].dir === 'desc'){
@@ -534,6 +568,16 @@ export default {
           else{
             this.undebounced_sort_action(undefined, sortBy.value[i].col)
           }
+        }
+      }
+      let filterBy = this.get_url_parameter('filterBy');
+      if(!filterBy.notFound){
+        for(let key in filterBy.value){
+          this.$set(this.filter_inputs, key, filterBy.value[key])
+          setTimeout(() => {
+            this.$refs.input[this.get_header_list.keys.indexOf(key)].value = filterBy.value[key]
+            this.undebounced_input_changed(null, key, this.get_header_list.keys.indexOf(key))
+          }, 1000);
         }
       }
     },
@@ -563,6 +607,11 @@ export default {
 #prot_table a:visited {
   color: var(--table-visited-color);
   text-decoration: var(--table-visited-deco);
+}
+
+.pageSelect:hover, .pageEnd:hover {
+  background: var(--grid-gap-color);
+  cursor: pointer;
 }
 </style>
 
@@ -650,6 +699,35 @@ export default {
 .input_field {
   box-sizing: border-box;
   padding: 5px;
+}
+
+#footer {
+  height: 1.5em;
+  background: var(--header-background);
+  box-sizing: content-box;
+  border-top: var(--filter-field-border);
+  grid-area: var(--grid-footer-area);
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  vertical-align: middle;
+}
+
+.pageEnd {
+  width: 2em;
+}
+
+.pageSelect {
+  width: 1em;
+}
+
+.pageSelect, .pageEnd {
+  height: 1em;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .arrow {
