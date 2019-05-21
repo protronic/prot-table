@@ -119,11 +119,7 @@ export default {
         showTimers: true,
         headerDef: {},
         resizable: false,
-        routing: true,
-        pagination: {
-          activ: true,
-          rows: 100
-        }
+        routing: true
       },
       original_table_data: [],
       sorted_data: {

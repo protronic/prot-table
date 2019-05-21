@@ -35,11 +35,7 @@ export default {
         "showTimers": true,
         "headerDef": {},
         "resizable": false,
-        "routing": true,
-        "pagination": {
-          "activ": true,
-          "rows": 20
-        }
+        "routing": true
       }
     };
   },
