@@ -16,6 +16,29 @@ export default {
     return {
       table_data: [],
       options: {
+        "formatter": {
+          "active": true,
+          "externelFunction": undefined,
+          "options": {}
+        },
+        "pagination": {
+          "active": true,
+          "externelFunction": undefined,
+          "options": {
+            "rows": 10
+          }
+        },
+        "filters": {
+          "active": true,
+          "externelFunction": undefined,
+          "options": {
+            "connection_operation": "and",
+            "matchFilter": {},
+            "showInputs": true,
+            "inputRegExp": true,
+            "filter_inputs": {},
+          }
+        },
         "height": "auto", 
         "sortability": {},
         "tableStyles": {},
@@ -23,19 +46,12 @@ export default {
         "bodyStyles": {},
         "rowStyles": [],
         "colStyles": {},
-        "formatter": {},
         "cssVariables": {},
         "dontShowCols": [],
-        "filters": {
-          "connection_operation": "and",
-          "matchFilter": {},
-          "showInputs": true,
-          "inputRegExp": true
-        },
         "showTimers": true,
         "headerDef": {},
         "resizable": false,
-        "routing": true
+        "routing": true,
       }
     };
   },
@@ -120,6 +136,7 @@ export default {
      * 
     */
     table_options: [Object, String],
+
   },
   methods: {
     fetch_table_data (url){

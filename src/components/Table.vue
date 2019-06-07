@@ -5,7 +5,7 @@
     :style="[
       update_column_sizes, {
         'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
-        'height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
+        'max-height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
         'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
       }, 
       table_options.tableStyles, 
@@ -41,16 +41,16 @@
     ></div>
     <div
       v-for="(col, i) of get_header_list.keys"
-      v-show="table_options.filters.showInputs"
+      v-show="table_options.filters.options.showInputs"
       :key="'filter_' + i"
       :class="['filter_field', 'filter_field_' + col]"
-      :style="[{}, table_options.filters.divStyles || {}]"
+      :style="[{}, table_options.filters.options.divStyles || {}]"
       @mouseup="table_options.resizable ? resizeClick($event, col, i) : false"
     >
       <input
         type="text"
         ref="input"
-        :style="[table_options.filters.inputStyles || {}]"
+        :style="[table_options.filters.options.inputStyles || {}]"
         @input="input_changed($event, col, i)"
       >
     </div>
@@ -72,13 +72,13 @@
         <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
-    <div id="footer" ref="footer" v-show="total_pages > 1" @click="logCurrent">
-      <div class="firstPage pageEnd" @click="current_page = 0">&lt;&lt;</div>
-      <div class="previousPage pageSelect" @click="current_page = Math.max(current_page - 1, 0)">&lt;</div>
-      <div v-for="(e, i) in [...Array(Math.min(total_pages, 9))]" :key="i" class="pageSelect" @click="current_page = i">{{i + 1}}</div>
-      <div v-show="total_pages > 9" class="pageSelect">..</div>
-      <div class="nextPage pageSelect" @click="current_page = Math.min(current_page + 1, total_pages - 1)">&gt;</div>
-      <div class="lastPage pageEnd" @click="current_page = total_pages - 1">&gt;&gt;</div>
+    <div id="footer" ref="footer" v-show="pagination.paginationState.total_pages > 1" @click="logCurrent">
+      <div class="firstPage pageEnd" @click="pagination.paginationState.current_page = 0">&lt;&lt;</div>
+      <div class="previousPage pageSelect" @click="pagination.paginationState.current_page = Math.max(pagination.paginationState.current_page - 1, 0)">&lt;</div>
+      <div v-for="(e, i) in [...Array(Math.min(pagination.paginationState.total_pages, 9))]" :key="i" class="pageSelect" @click="pagination.paginationState.current_page = i">{{i + 1}}</div>
+      <div v-show="pagination.paginationState.total_pages > 9" class="pageSelect">..</div>
+      <div class="nextPage pageSelect" @click="pagination.paginationState.current_page = Math.min(pagination.paginationState.current_page + 1, pagination.paginationState.total_pages - 1)">&gt;</div>
+      <div class="lastPage pageEnd" @click="pagination.paginationState.current_page = pagination.paginationState.total_pages - 1">&gt;&gt;</div>
     </div>
   </div>
 </template>
@@ -88,6 +88,17 @@ import Vue from "vue";
 import debounce from "lodash.debounce";
 import { Promise } from 'q';
 import { setTimeout } from 'timers';
+import formatter from './formatter.js';
+import pagination from './pagination.js';
+import filter from './filter.js';
+
+console.log({filter, formatter, pagination})
+
+
+
+// let filter = require('../modules/filter');
+// let formatter = require('../modules/formatter');
+// let pagination = require('../modules/pagination');
 
 export default {
   name: "protVueTable",
@@ -98,7 +109,6 @@ export default {
   },
   data: function() {
     return {
-      filter_inputs: {},
       table_options: {
         height: "auto",
         sortability: {},
@@ -107,19 +117,35 @@ export default {
         bodyStyles: {},
         rowStyles: [],
         colStyles: {},
-        formatter: {},
+        formatter: {
+          active: true,
+          externelFunction: undefined,
+          options: {}
+        },
         cssVariables: {},
         dontShowCols: [],
         filters: {
-          connection_operation: "and",
-          matchFilter: {},
-          showInputs: true,
-          inputRegExp: true
+          active: true,
+          externelFunction: undefined,
+          options: {
+            connection_operation: "and",
+            matchFilter: {},
+            showInputs: true,
+            inputRegExp: true,
+            filter_inputs: {},
+          }
         },
         showTimers: true,
         headerDef: {},
         resizable: false,
-        routing: true
+        routing: true,
+        pagination: {
+          active: true,
+          externelFunction: undefined,
+          options: {
+            rows: 300
+          }
+        }
       },
       original_table_data: [],
       sorted_data: {
@@ -130,14 +156,19 @@ export default {
         previousSort_dirs: []
       },
       debug: [],
+      filter: filter,
+      formatter: formatter,
+      pagination: pagination,
       // dont_schow: [],
-      current_page: 0,
-      total_pages: 0
+      // current_page: 0,
+      // total_pages: 0
     };
   },
   props: {
     table_data: Array,
-    options: Object
+    options: Object,
+    
+    filterOpt: Object,
   },
   created() {
     this.input_changed = debounce(this.input_changed, 500, {
@@ -169,112 +200,30 @@ export default {
           "--grid-footer-area",
           `${this.display_table_data.length * 2 + 3} / 1 / ${this.display_table_data.length * 2 + 3} / ${this.get_header_list.keys.length + 1}`
         );
-        if(this.table_options.pagination && this.table_options.pagination.activ){
-          this.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.rows)
+        if(this.table_options.pagination.active){
+          pagination.paginationState.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.options.rows)
         }
         else{
-          this.total_pages = 0;
+          pagination.paginationState.total_pages = 0;
         }
       }
       this.table_options = this.options;
     });
   },
   computed: {
-    display_table_data() {
-      if (this.sorted_data.data) {
-        if (this.table_options.showTimers) console.time("applying_filter");
+    display_table_data(){
+      if (this.sorted_data.data && this.table_options) {
+        console.log(this.table_options.filters)
+        let filter_applied = filter.apply(this.sorted_data.data, this.table_options.filters);
+        console.log('filter', filter_applied)
+        let formatter_applied = formatter.apply(filter_applied, this.table_options.formatter, this.get_header_list) ;
+        console.log('formatter', formatter_applied)
+        let paginated = pagination.apply(formatter_applied, this.table_options.pagination);
+        console.log('page', paginated)
 
-        let filter_applied = this.sorted_data.data.filter(
-          (row, row_index, full_data) => {
-            let filter = this.table_options.filters;
-            let result = [];
-            if (filter && filter.matchFilter) {
-              for (let key in filter.matchFilter) {
-                if (filter.matchFilter[key]) {
-                  if (
-                    typeof filter.matchFilter[key] === "string" ||
-                    filter.matchFilter[key] instanceof RegExp
-                  ) {
-                    if (row[key] !== undefined) {
-                      result.push(
-                        row[key]
-                          .toString()
-                          .toLowerCase()
-                          .match(filter.matchFilter[key])
-                      );
-                    }
-                  } else if (typeof filter.matchFilter[key] === "function") {
-                    result.push(
-                      filter.matchFilter[key](row[key], row_index, full_data)
-                    );
-                  }
-                }
-              }
-            }
-            if (filter.connection_operation === "or" && result.length === 0)
-              return true;
-            return result.reduce(
-              (collector, current) =>
-                filter.connection_operation === "and"
-                  ? collector && current
-                  : collector || current,
-              filter.connection_operation === "and" ? true : false
-            );
-          }
-        );
-
-        if (this.table_options.showTimers) console.timeEnd("applying_filter");
-
-        if (this.table_options.showTimers) console.time("applying_formatter");
-
-        let formatter_applied = filter_applied;
-        if (this.table_options.formatter) {
-          let all_formatter = {};
-          if (this.table_options.formatter["#all"]) {
-            for (let i = 0; i < this.get_header_list.keys.length; i++) {
-              all_formatter[this.get_header_list.keys[i]] = (
-                value,
-                index,
-                row
-              ) => this.table_options.formatter["#all"](value, index, row);
-            }
-          }
-          for (let key in this.table_options.formatter) {
-            all_formatter[key] = (value, index, row) =>
-              this.table_options.formatter["#all"](
-                this.table_options.formatter[key](value, index, row),
-                index,
-                row
-              );
-          }
-          formatter_applied = filter_applied.map((row, row_index) => {
-            const result = {};
-            for (let key in row) {
-              if (all_formatter[key]) {
-                try {
-                  result[key] = all_formatter[key](row[key], row_index, row);
-                } catch (e) {
-                  if (e instanceof TypeError) {
-                    console.log("caught error.");
-                    all_formatter[key] = (value, index, row) =>
-                      this.table_options.formatter[key](value, index, row);
-                  }
-                }
-              } else {
-                result[key] = row[key];
-              }
-            }
-            return result;
-          });
-        }
-        if (this.table_options.showTimers)
-          console.timeEnd("applying_formatter");
-        let paginated = formatter_applied;
-        if(this.table_options.pagination && this.table_options.pagination.activ && this.total_pages > 0){
-          paginated = formatter_applied.filter( (value, index) => (index > (this.current_page * this.table_options.pagination.rows) && (index <= (this.current_page * this.table_options.pagination.rows) + this.table_options.pagination.rows) ? true : false));
-        }
         return paginated;
-      } else {
+      }
+      else{
         return [];
       }
     },
@@ -405,16 +354,16 @@ export default {
         console.log('---- input change detected')
         let value = this.$refs.input[col_index].value;
         this.$set(
-          this.filter_inputs,
+          this.table_options.filters.options.filter_inputs,
           col,
-          this.table_options.filters.inputRegExp && value !== ""
+          this.table_options.filters.options.inputRegExp && value !== ""
             ? RegExp(value, "gim")
             : value
         );
       } catch (err) {
         console.error(err);
       }
-      this.table_options.filters.matchFilter = this.filter_inputs;
+      this.table_options.filters.options.matchFilter = this.table_options.filters.options.filter_inputs;
     },
     override_table_option() {
       for (let key in this.table_options) {
@@ -546,7 +495,7 @@ export default {
       return result;
     },
     logCurrent(){
-      console.log(this.current_page)
+      console.log(pagination.paginationState.current_page)
     }
   },
   watch: {
@@ -569,7 +518,7 @@ export default {
       let filterBy = this.get_url_parameter('filterBy');
       if(!filterBy.notFound){
         for(let key in filterBy.value){
-          this.$set(this.filter_inputs, key, filterBy.value[key])
+          this.$set(this.table_options.filters.options.filter_inputs, key, filterBy.value[key])
           setTimeout(() => {
             this.$refs.input[this.get_header_list.keys.indexOf(key)].value = filterBy.value[key]
             this.undebounced_input_changed(null, key, this.get_header_list.keys.indexOf(key))
@@ -659,8 +608,9 @@ export default {
   top: var(--filter-top-offset);
   left: 0px;
   position: sticky;
-  box-sizing: border-box;
-  border: var(--filter-field-border);
+  box-sizing: content-box;
+  border-top: var(--filter-field-border);
+  border-bottom: var(--filter-field-border);
 }
 
 .filter_field input {
@@ -723,7 +673,7 @@ export default {
   margin-top: auto;
   margin-bottom: auto;
   vertical-align: middle;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .arrow {
