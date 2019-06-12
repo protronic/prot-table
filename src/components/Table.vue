@@ -213,13 +213,29 @@ export default {
   computed: {
     display_table_data(){
       if (this.sorted_data.data && this.table_options) {
-        console.log(this.table_options.filters)
-        let filter_applied = filter.apply(this.sorted_data.data, this.table_options.filters);
-        console.log('filter', filter_applied)
-        let formatter_applied = formatter.apply(filter_applied, this.table_options.formatter, this.get_header_list) ;
-        console.log('formatter', formatter_applied)
-        let paginated = pagination.apply(formatter_applied, this.table_options.pagination);
-        console.log('page', paginated)
+        let filter_applied = this.sorted_data.data
+        try{
+          filter_applied = filter.apply(this.sorted_data.data, this.table_options.filters);
+        }
+        catch(err){
+          console.error(err)
+        }
+        
+        let formatter_applied = filter_applied;
+        try{
+          formatter_applied = formatter.apply(filter_applied, this.table_options.formatter, this.get_header_list) ;
+        }
+        catch(err){
+          console.error(err)
+        }
+        
+        let paginated = formatter_applied;
+        try{
+          paginated = pagination.apply(formatter_applied, this.table_options.pagination);
+        }
+        catch(err){
+          console.error(err)
+        }
 
         return paginated;
       }
