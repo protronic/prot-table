@@ -25,7 +25,7 @@ export default {
           "active": true,
           "externelFunction": undefined,
           "options": {
-            "rows": 10
+            "rows": 300
           }
         },
         "filters": {
