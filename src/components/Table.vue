@@ -395,6 +395,7 @@ export default {
         this.sort_data(sort_key, this.get_sortability[sort_key], e === undefined ? false : true);
       } catch (err) {
         console.error(err);
+        this.sort_data(sort_key, 'abc', e === undefined ? false : true)
       }
     },
     compare_numbers(a, b) {
