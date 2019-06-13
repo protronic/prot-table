@@ -546,7 +546,10 @@ export default {
       }
     },
     options: function(newValue) {
-      this.table_options = newValue;
+      // this.table_options = newValue;
+      for(let key in newValue){
+        this.$set(this.table_options, key, newValue[key]);
+      }
     }
   }
 };
