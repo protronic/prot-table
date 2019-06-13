@@ -212,6 +212,7 @@ export default {
   },
   computed: {
     display_table_data(){
+      console.log({sorted: this.sorted_data.data, original: this.original_table_data, options: this.table_options})
       if ((this.sorted_data.data || this.original_table_data) && this.table_options) {
         let data = this.sorted_data.data || this.original_table_data;
         let filter_applied = data
