@@ -213,9 +213,10 @@ export default {
   computed: {
     display_table_data(){
       if ((this.sorted_data.data || this.original_table_data) && this.table_options) {
-        let filter_applied = this.sorted_data.data || this.original_table_data
+        let data = this.sorted_data.data || this.original_table_data;
+        let filter_applied = data
         try{
-          filter_applied = filter.apply(this.sorted_data.data, this.table_options.filters);
+          filter_applied = filter.apply(data, this.table_options.filters);
         }
         catch(err){
           console.error(err)
