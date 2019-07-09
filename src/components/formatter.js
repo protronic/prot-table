@@ -47,7 +47,6 @@ class Formatter {
               result[key] = all_formatter[key](row[key], row_index, row);
             } catch (e) {
               if (e instanceof TypeError) {
-                console.log("caught error.");
                 all_formatter[key] = (value, index, row) =>
                 formatter[key](value, index, row);
               }

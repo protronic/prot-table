@@ -1,16 +1,12 @@
 class Pagination {
   constructor(){
-    this.paginationState = {
-      current_page: 0,
-      total_pages: 0
-    }
   }
 
   updateOpt(opts){
     this.opts = opts;
   }
 
-  apply(data, opts){
+  apply(data, opts, cur, total_pages){
 
     // opts = {
     //   active: true,
@@ -23,11 +19,14 @@ class Pagination {
     if (opts.externalFunction !== undefined){
       return opts.externalFunction(data, opts)
     }
-    else if (!opts.active || !this.paginationState.total_pages > 0){
+    else if (!opts.active || !total_pages > 0){
       return data;
     }
     else {
-      let current_page = this.paginationState.current_page;
+      // console.log('DATA LENGTH', data, data.length, opts.options.rows);
+      
+      let current_page = Math.min(cur, total_pages);
+      
       return data.filter( (value, index) => (index >= (current_page * opts.options.rows) && (index < (current_page * opts.options.rows) + opts.options.rows) ? true : false));     
     }
   }

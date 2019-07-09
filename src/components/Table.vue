@@ -72,13 +72,13 @@
         <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
-    <div id="footer" ref="footer" v-show="pagination.paginationState.total_pages > 1" @click="logCurrent">
-      <div class="firstPage pageEnd" @click="pagination.paginationState.current_page = 0">&lt;&lt;</div>
-      <div class="previousPage pageSelect" @click="pagination.paginationState.current_page = Math.max(pagination.paginationState.current_page - 1, 0)">&lt;</div>
-      <div v-for="(e, i) in [...Array(Math.min(pagination.paginationState.total_pages, 9))]" :key="i" class="pageSelect" @click="pagination.paginationState.current_page = i">{{i + 1}}</div>
-      <div v-show="pagination.paginationState.total_pages > 9" class="pageSelect">..</div>
-      <div class="nextPage pageSelect" @click="pagination.paginationState.current_page = Math.min(pagination.paginationState.current_page + 1, pagination.paginationState.total_pages - 1)">&gt;</div>
-      <div class="lastPage pageEnd" @click="pagination.paginationState.current_page = pagination.paginationState.total_pages - 1">&gt;&gt;</div>
+    <div id="footer" ref="footer" v-show="get_total_pages() > 1" @click="logCurrent">
+      <div class="firstPage pageEnd" @click="change_to_page(0)">&lt;&lt;</div>
+      <div class="previousPage pageSelect" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
+      <div v-for="(e, i) in [...Array(Math.min(get_total_pages(), 9))]" :key="i" class="pageSelect" @click="change_to_page(i)">{{i + 1}}</div>
+      <div v-show="get_total_pages() > 9" class="pageSelect">..</div>
+      <div class="nextPage pageSelect" @click="change_to_page(Math.min(get_current_page() + 1, get_total_pages() - 1))">&gt;</div>
+      <div class="lastPage pageEnd" @click="change_to_page(get_total_pages() - 1)">&gt;&gt;</div>
     </div>
   </div>
 </template>
@@ -109,6 +109,7 @@ export default {
   },
   data: function() {
     return {
+      datalength: 0,
       table_options: {
         height: "auto",
         sortability: {},
@@ -154,6 +155,10 @@ export default {
         currentSortDir: "",
         previousSorts: [],
         previousSort_dirs: []
+      },
+      paginationState :{
+        current_page: 0,
+        total_pages: 0
       },
       debug: [],
       filter: filter,
@@ -201,10 +206,10 @@ export default {
           `${this.display_table_data.length * 2 + 3} / 1 / ${this.display_table_data.length * 2 + 3} / ${this.get_header_list.keys.length + 1}`
         );
         if(this.table_options.pagination.active){
-          pagination.paginationState.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.options.rows)
+          this.paginationState.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.options.rows)
         }
         else{
-          pagination.paginationState.total_pages = 0;
+          this.paginationState.total_pages = 0;
         }
       }
       this.table_options = this.options;
@@ -212,12 +217,13 @@ export default {
   },
   computed: {
     display_table_data(){
-      console.log({sorted: this.sorted_data.data, original: this.original_table_data, options: this.table_options})
+      console.log({sorted: this.sorted_data.data, original: this.original_table_data, options: this.table_options, pageination: this.paginationState})
       if ((this.sorted_data.data || this.original_table_data) && this.table_options) {
         let data = this.sorted_data.data || this.original_table_data;
         let filter_applied = data
         try{
           filter_applied = filter.apply(data, this.table_options.filters);
+          this.datalength = filter_applied.length;
         }
         catch(err){
           console.error(err)
@@ -233,12 +239,12 @@ export default {
         
         let paginated = formatter_applied;
         try{
-          paginated = pagination.apply(formatter_applied, this.table_options.pagination);
+          // this.set_page_total();
+          paginated = pagination.apply(formatter_applied, this.table_options.pagination, this.paginationState.current_page, this.paginationState.total_pages);
         }
         catch(err){
           console.error(err)
         }
-
         return paginated;
       }
       else{
@@ -354,6 +360,23 @@ export default {
     }
   },
   methods: {
+    change_to_page(page){
+      this.paginationState.current_page = page;
+      this.$refs.prot_table.scrollTop = 0;
+    },
+    get_total_pages(){
+      return Math.min(this.paginationState.total_pages, Math.ceil(this.datalength / this.table_options.pagination.options.rows));
+    },
+    get_current_page(){
+      return Math.min(this.paginationState.total_pages, this.paginationState.current_page);
+    },
+    set_page_total(){
+      console.log(this.paginationState.total_pages, Math.ceil(this.datalength / this.table_options.pagination.options.rows))
+      if(this.paginationState.total_pages != Math.ceil(this.datalength / this.table_options.pagination.options.rows)){
+        this.paginationState.total_pages = Math.ceil(this.datalength / this.table_options.pagination.options.rows);
+        this.paginationState.current_page = Math.min(this.paginationState.current_page, this.paginationState.total_pages);
+      }
+    },
     resizeClick(event, col, ind) {
       // if(!col && !ind){
       //   for (let i in this.$refs.resize) {
@@ -473,7 +496,7 @@ export default {
     },
     set_url_parameter(param, value) {
       let resultURI = "";
-      let url = location.href;
+      let url = decodeURI(location.href);
       if (url.includes("?")) {
         let match = url
           .split("?")
@@ -514,7 +537,7 @@ export default {
       return result;
     },
     logCurrent(){
-      console.log(pagination.paginationState.current_page)
+      console.log(this.paginationState.current_page)
     }
   },
   watch: {
@@ -547,6 +570,8 @@ export default {
     },
     options: function(newValue) {
       // this.table_options = newValue;
+      console.log('---- options changed')
+
       for(let key in newValue){
         this.$set(this.table_options, key, newValue[key]);
       }
