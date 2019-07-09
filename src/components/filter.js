@@ -27,33 +27,21 @@ class Filter{
         (row, row_index, full_data) => {
           let result = [];
           if (opts.options && opts.options.matchFilter) {
+            opts.options.negate = {};
             for (let key in opts.options.matchFilter) {
               if (opts.options.matchFilter[key]) {
+                opts.options.negate[key] = this.test_for_negation(opts.options.matchFilter[key])
                 if (
                   typeof opts.options.matchFilter[key] === "string" ||
                   opts.options.matchFilter[key] instanceof RegExp
                 ) {
-                  let negate = false;
-                  let negateFilter = undefined;
-                  // console.log(opts.options.matchFilter[key] instanceof RegExp, opts.options.matchFilter[key], opts.options.matchFilter[key].toString(), opts.options.matchFilter[key].toString().match('!!!'))
-                  if (opts.options.matchFilter[key] instanceof RegExp && opts.options.matchFilter[key].toString().match('!!!') !== null){
-                    negate = true;
-                    negateFilter = new RegExp(opts.options.matchFilter[key].toString().replace(/!!!/, ''));
-                  }
-                  else if (typeof opts.options.matchFilter[key] === "string" && opts.options.matchFilter[key].match('!!!') !== null){
-                    negate = true;
-                    negateFilter = opts.options.matchFilter[key].replace(/!!!/, '');
-                  }
-                  else{
-                    negate = false;
-                  }
                   if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
                     result.push(
-                      negate ? // fragezeichen op
-                        !row[key]
+                      opts.options.negate[key].do_negate ? // fragezeichen op
+                        !(row[key]
                           .toString()
                           .toLowerCase()
-                          .match(negateFilter) : // else
+                          .match(opts.options.negate[key].filter)) : // else
                         row[key]
                           .toString()
                           .toLowerCase()
@@ -84,8 +72,25 @@ class Filter{
       );
     }
   }
+
+  test_for_negation(filter){
+    const result = {
+      do_negate: false,
+      filter: undefined
+    }
+    if(filter instanceof RegExp){
+      result.do_negate = (filter.source.match('!!!') !== null);
+      result.filter = (new RegExp(filter.source.replace(/!!!/, '')));
+    }
+    else if (typeof filter === "string"){
+      result.do_negate = (filter.match('!!!') !== null);
+      result.filter = filter.replace(/!!!/, '');
+    }
+    else {
+      result.do_negate = false;
+    }
+    return result;
+  }
 }
-
-
 
 export default new Filter();
