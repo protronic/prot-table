@@ -49,7 +49,7 @@ class Filter{
                     );
                   }
                   else{
-                    result.push(false);
+                    result.push(opts.options.negate[key].do_negate);
                   }
                 } else if (typeof opts.options.matchFilter[key] === "function") {
                   result.push(
@@ -80,7 +80,7 @@ class Filter{
     }
     if(filter instanceof RegExp){
       result.do_negate = (filter.source.match('!!!') !== null);
-      result.filter = (new RegExp(filter.source.replace(/!!!/, '')));
+      result.filter = (new RegExp(filter.source.replace(/!!!/, ''), filter.flags));
     }
     else if (typeof filter === "string"){
       result.do_negate = (filter.match('!!!') !== null);

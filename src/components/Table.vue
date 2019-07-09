@@ -51,6 +51,7 @@
         type="text"
         ref="input"
         :style="[table_options.filters.options.inputStyles || {}]"
+        v-model="table_options.filters.options.filter_inputs[col]"
         @input="input_changed($event, col, i)"
       >
     </div>
@@ -73,6 +74,8 @@
       </template>
     </template>
     <div id="footer" ref="footer" v-show="get_total_pages() > 1" @click="logCurrent">
+      <div class="totalCount">Total Count: {{ datalength }}</div>
+      <div class="stopper"></div>
       <div class="firstPage pageEnd" @click="change_to_page(0)">&lt;&lt;</div>
       <div class="previousPage pageSelect" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
       <div v-for="(e, i) in [...Array(Math.min(get_total_pages(), 9))]" :key="i" class="pageSelect" @click="change_to_page(i)">{{i + 1}}</div>
@@ -94,7 +97,25 @@ import filter from './filter.js';
 
 console.log({filter, formatter, pagination})
 
+function stringify_regex(key, value){
+  // let result = {};
 
+  // for(let key in value){
+  //   if (!value[key] instanceof RegExp) return null;
+  //   console.log(`der key ${key} hat den Wert ${value[key]}.`)
+  //   if (value[key] instanceof RegExp){
+  //     result[key] = value[key].toString();
+  //   }  
+  // }
+  
+  // return result
+  console.log(`Key: ${key}; Value: ${value};`)
+  if(value instanceof RegExp){
+    return value.toString();
+  }
+  else
+    return value;
+}
 
 // let filter = require('../modules/filter');
 // let formatter = require('../modules/formatter');
@@ -185,6 +206,14 @@ export default {
       leading: true
     });
   },
+  mounted() {
+    // for(let key in this.table_options.filters.options.filter_input){
+    //   // setTimeout(() => {
+    //   this.$refs.input[key].value = this.table_options.filters.options.filter_input[key].source;
+    //   // this.undebounced_input_changed(null, key, this.get_header_list.keys.indexOf(key))
+    //   // }, 2000);
+    // }
+  },
   updated() {
     this.$nextTick(() => {
       const cssVars = this.cssVariables;
@@ -194,6 +223,13 @@ export default {
           "--filter-top-offset",
           `${this.$refs.header[0].offsetHeight}px`
         );
+
+        let headers = this.$refs.header;
+
+        window.addEventListener('resize', function(event){
+          Vue.set(cssVars, "--filter-top-offset",  `${headers[0].offsetHeight}px`)
+        });
+
         this.$set(
           cssVars,
           "--grid-template-columns",
@@ -395,16 +431,31 @@ export default {
         console.log('---- input change detected')
         let value = this.$refs.input[col_index].value;
         this.$set(
-          this.table_options.filters.options.filter_inputs,
+          this.table_options.filters.options.matchFilter,
           col,
           this.table_options.filters.options.inputRegExp && value !== ""
-            ? RegExp(value, "gim")
+            ? new RegExp(value, "gim")
             : value
         );
+        let filterByParam = {};
+        for(let key in this.table_options.filters.options.matchFilter){
+          if(this.table_options.filters.options.matchFilter[key]) filterByParam[key] = this.table_options.filters.options.matchFilter[key]
+        }
+        this.set_url_parameter('filterBy', 
+          filterByParam
+        )
+        // console.log(JSON.stringify(filterByParam, (key, value) => (value instanceof RegExp ? '/' + value.source + '/' + value.flags : value)))
+      
       } catch (err) {
         console.error(err);
       }
-      this.table_options.filters.options.matchFilter = this.table_options.filters.options.filter_inputs;
+      // for(let key in this.table_options.filters.options.filter_inputs){
+      //   this.table_options.filters.options.matchFilter[key] = this.table_options.filters.options.filter_inputs[key];
+      //   this.options.filters.options.matchFilter[key] = this.table_options.filters.options.filter_inputs[key];
+      //   this.$set(this.table_options.filters.options.matchFilter, key, this.table_options.filters.options.filter_inputs[key]);
+      // }
+      
+      // this.table_options.filters.options.matchFilter = this.table_options.filters.options.filter_inputs;
     },
     override_table_option() {
       for (let key in this.table_options) {
@@ -506,10 +557,10 @@ export default {
           .reduce((col, cur) => (cur.split("=")[0] === param ? cur : col), "");
         resultURI =
           match === ""
-            ? `${url}&${param}=${JSON.stringify(value)}`
-            : url.replace(match, `${param}=${JSON.stringify(value)}`);
+            ? `${url}&${param}=${JSON.stringify(value, stringify_regex)}`
+            : url.replace(match, `${param}=${JSON.stringify(value, stringify_regex)}`);
       } else {
-        resultURI = `${url}?${param}=${JSON.stringify(value)}`;
+        resultURI = `${url}?${param}=${JSON.stringify(value, stringify_regex)}`;
       }
 
       history.pushState(null, "", encodeURI(resultURI));
@@ -529,12 +580,37 @@ export default {
               cur.split("=")[0] === param ? cur.split("=")[1] : col,
             ""
           ));
-        result.value = JSON.parse(value);
+        result.value = JSON.parse(value, (key, val) => {
+          if(typeof val === 'string'){
+            console.log({key: key, val: val})
+            let matches = val.match(/\/(.*)\/(.*)/);
+            console.log(matches);
+            return new RegExp(matches[1], matches[2]);
+          }
+          else{
+            return val;
+          }
+
+        });
       } catch (e) {
         result.notFound = true;
       }
 
       return result;
+    },
+    get_url_filter_parameter(param){
+      let result = { key: param, value: '' };
+      let url = location.href;
+
+      try{
+        let value = decodeURI(url
+          .split('?')
+          .slice(1)
+          .join())
+      }
+      catch(e){
+
+      }
     },
     logCurrent(){
       console.log(this.paginationState.current_page)
@@ -543,6 +619,10 @@ export default {
   watch: {
     table_data: function(newValue) {
       this.original_table_data = newValue;
+      for(let i = 0; i < this.get_header_list.keys.length; i++){
+        this.table_options.filters.options.filter_inputs[this.get_header_list.keys[i]] = ''
+      }
+      
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
       let sortBy = this.get_url_parameter('sortBy');
@@ -559,12 +639,11 @@ export default {
       }
       let filterBy = this.get_url_parameter('filterBy');
       if(!filterBy.notFound){
-        for(let key in filterBy.value){
-          this.$set(this.table_options.filters.options.filter_inputs, key, filterBy.value[key])
-          setTimeout(() => {
-            this.$refs.input[this.get_header_list.keys.indexOf(key)].value = filterBy.value[key]
-            this.undebounced_input_changed(null, key, this.get_header_list.keys.indexOf(key))
-          }, 1000);
+        let filters = filterBy.value;
+        for(let key in filters){
+          console.log(`---- setting filter ${key} to /${filters[key].source}/`)
+          this.$set(this.options.filters.options.filter_inputs, key, filters[key].source);
+          this.$set(this.options.filters.options.matchFilter, key, filters[key]);
         }
       }
     },
@@ -574,6 +653,7 @@ export default {
 
       for(let key in newValue){
         this.$set(this.table_options, key, newValue[key]);
+        this.input_changed(new Event(''), key, this.get_header_list.keys.indexOf(key))
       }
     }
   }
@@ -721,6 +801,18 @@ export default {
   margin-bottom: auto;
   vertical-align: middle;
   /* overflow: hidden; */
+}
+
+.totalCount {
+  height: 1em;
+  margin-top: auto;
+  margin-bottom: auto;
+  vertical-align: middle;
+}
+
+.stopper {
+  height: 1em;
+  width: 50%;
 }
 
 .arrow {
