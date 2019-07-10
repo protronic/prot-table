@@ -73,15 +73,15 @@
         <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
-    <div id="footer" ref="footer" v-show="get_total_pages() > 1" @click="logCurrent">
-      <div class="totalCount">Total Count: {{ datalength }}</div>
+    <div id="footer" ref="footer" @click="logCurrent">
+      <div class="totalCount">Zeilen: {{ datalength }}, Zeilen pro Seite: {{ table_options.pagination.options.rows }}</div>
       <div class="stopper"></div>
-      <div class="firstPage pageEnd" @click="change_to_page(0)">&lt;&lt;</div>
-      <div class="previousPage pageSelect" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
-      <div v-for="(e, i) in [...Array(Math.min(get_total_pages(), 9))]" :key="i" class="pageSelect" @click="change_to_page(i)">{{i + 1}}</div>
+      <div class="firstPage pageEnd" v-show="(get_total_pages() > 1)" @click="change_to_page(0)">&lt;&lt;</div>
+      <div class="previousPage pageSelect" v-show="(get_total_pages() > 1)" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
+      <div v-for="(e, i) in [...Array(Math.min(get_total_pages(), 9))]" v-show="(get_total_pages() > 1)" :key="i" class="pageSelect" @click="change_to_page(i)">{{i + 1}}</div>
       <div v-show="get_total_pages() > 9" class="pageSelect">..</div>
-      <div class="nextPage pageSelect" @click="change_to_page(Math.min(get_current_page() + 1, get_total_pages() - 1))">&gt;</div>
-      <div class="lastPage pageEnd" @click="change_to_page(get_total_pages() - 1)">&gt;&gt;</div>
+      <div class="nextPage pageSelect" v-show="(get_total_pages() > 1)" @click="change_to_page(Math.min(get_current_page() + 1, get_total_pages() - 1))">&gt;</div>
+      <div class="lastPage pageEnd" v-show="(get_total_pages() > 1)" @click="change_to_page(get_total_pages() - 1)">&gt;&gt;</div>
     </div>
   </div>
 </template>
@@ -598,20 +598,6 @@ export default {
 
       return result;
     },
-    get_url_filter_parameter(param){
-      let result = { key: param, value: '' };
-      let url = location.href;
-
-      try{
-        let value = decodeURI(url
-          .split('?')
-          .slice(1)
-          .join())
-      }
-      catch(e){
-
-      }
-    },
     logCurrent(){
       console.log(this.paginationState.current_page)
     }
@@ -805,6 +791,8 @@ export default {
 
 .totalCount {
   height: 1em;
+  width: 100%;
+  text-align: left;
   margin-top: auto;
   margin-bottom: auto;
   vertical-align: middle;
