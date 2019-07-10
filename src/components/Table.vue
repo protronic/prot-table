@@ -24,9 +24,9 @@
       {{ get_header_list.display[key] }}
       <i
         :class="[
-        'arrow', 
-        (sort_arrow.key === key) ? (sort_arrow.dir === 'asc' ? 'down_1' : 'up_1') : '',
-        (sort_arrow.secondary_key === key) ? (sort_arrow.secondary_dir === 'asc' ? 'down_2' : 'up_2') : ''
+          'arrow', 
+          (sort_arrow.key === key) ? (sort_arrow.dir === 'asc' ? 'up_1' : 'down_1') : '',
+          (sort_arrow.secondary_key === key) ? (sort_arrow.secondary_dir === 'asc' ? 'up_2' : 'down_2') : ''
       ]"
       ></i>
     </div>
@@ -557,10 +557,10 @@ export default {
           .reduce((col, cur) => (cur.split("=")[0] === param ? cur : col), "");
         resultURI =
           match === ""
-            ? `${url}&${param}=${JSON.stringify(value, stringify_regex)}`
-            : url.replace(match, `${param}=${JSON.stringify(value, stringify_regex)}`);
+            ? `${url}&${param}=${btoa(JSON.stringify(value, stringify_regex))}`
+            : url.replace(match, `${param}=${btoa(JSON.stringify(value, stringify_regex))}`);
       } else {
-        resultURI = `${url}?${param}=${JSON.stringify(value, stringify_regex)}`;
+        resultURI = `${url}?${param}=${btoa(JSON.stringify(value, stringify_regex))}`;
       }
 
       history.pushState(null, "", encodeURI(resultURI));
@@ -580,12 +580,15 @@ export default {
               cur.split("=")[0] === param ? cur.split("=")[1] : col,
             ""
           ));
-        result.value = JSON.parse(value, (key, val) => {
+        result.value = JSON.parse(atob(value), (key, val) => {
           if(typeof val === 'string'){
             console.log({key: key, val: val})
             let matches = val.match(/\/(.*)\/(.*)/);
             console.log(matches);
-            return new RegExp(matches[1], matches[2]);
+            if (matches)
+              return new RegExp(matches[1], matches[2]);
+            else 
+              return val;  
           }
           else{
             return val;
@@ -594,6 +597,7 @@ export default {
         });
       } catch (e) {
         result.notFound = true;
+        console.error(e)
       }
 
       return result;
@@ -612,6 +616,7 @@ export default {
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
       let sortBy = this.get_url_parameter('sortBy');
+      console.log(sortBy)
       if(!sortBy.notFound){
         for(let i = 0; i < sortBy.value.length; i++){
           if(sortBy.value[i].dir === 'desc'){
