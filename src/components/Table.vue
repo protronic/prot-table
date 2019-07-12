@@ -661,7 +661,7 @@ export default {
       
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
-      
+      console.log('JSON in: ', atob(this.display_options))
       let display = JSON.parse(atob(this.display_options), parse_regex);
 
       let sortBy = this.get_url_parameter('sortBy');
@@ -670,14 +670,16 @@ export default {
         this.change_sort(sortBy.value);
       }
       else{
-        this.change_sort(display.sortBy);
+        if(display.sortBy)
+          this.change_sort(display.sortBy);
       }
       let filterBy = this.get_url_parameter('filterBy');
       if(!filterBy.notFound){
         this.change_filter(filterBy.value);
       }
       else{
-        this.change_filter(display.filterBy);
+        if(display.filterBy)
+          this.change_filter(display.filterBy);
       }
     },
     options: function(newValue) {
