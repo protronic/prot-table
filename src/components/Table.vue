@@ -98,23 +98,27 @@ import filter from './filter.js';
 console.log({filter, formatter, pagination})
 
 function stringify_regex(key, value){
-  // let result = {};
-
-  // for(let key in value){
-  //   if (!value[key] instanceof RegExp) return null;
-  //   console.log(`der key ${key} hat den Wert ${value[key]}.`)
-  //   if (value[key] instanceof RegExp){
-  //     result[key] = value[key].toString();
-  //   }  
-  // }
-  
-  // return result
-  console.log(`Key: ${key}; Value: ${value};`)
+  // console.log(`Key: ${key}; Value: ${value};`)
   if(value instanceof RegExp){
     return value.toString();
   }
   else
     return value;
+}
+
+function parse_regex(key, val){
+  if(typeof val === 'string'){
+    console.log({key: key, val: val})
+    let matches = val.match(/\/(.*)\/(.*)/);
+    console.log(matches);
+    if (matches)
+      return new RegExp(matches[1], matches[2]);
+    else 
+      return val;  
+  }
+  else{
+    return val;
+  }
 }
 
 // let filter = require('../modules/filter');
@@ -185,6 +189,7 @@ export default {
       filter: filter,
       formatter: formatter,
       pagination: pagination,
+      output_display_options: {}
       // dont_schow: [],
       // current_page: 0,
       // total_pages: 0
@@ -193,7 +198,7 @@ export default {
   props: {
     table_data: Array,
     options: Object,
-    
+    display_options: String,
     filterOpt: Object,
   },
   created() {
@@ -207,11 +212,40 @@ export default {
     });
   },
   mounted() {
-    // for(let key in this.table_options.filters.options.filter_input){
-    //   // setTimeout(() => {
-    //   this.$refs.input[key].value = this.table_options.filters.options.filter_input[key].source;
-    //   // this.undebounced_input_changed(null, key, this.get_header_list.keys.indexOf(key))
-    //   // }, 2000);
+    // if(this.display_options){
+    //   let {filterBy, sortBy} = JSON.parse(atob(this.display_options), parse_regex);
+    //   let useSortBy = false;
+    //   let useFilterBy = false;
+      
+    //   if( this.get_url_parameter('sortBy').notFound){
+    //     useSortBy = true;
+    //   }
+    //   if( this.get_url_parameter('filterBy').notFound){
+    //     useFilterBy = true;
+    //   }
+
+    //   this.$nextTick(function(){
+        
+    //     if(useFilterBy){
+    //       for(let key in filterBy){
+    //         console.log(`---- setting filter ${key} to /${filterBy[key].source}/`)
+    //         this.$set(this.options.filters.options.filter_inputs, key, filterBy[key].source);
+    //         this.$set(this.options.filters.options.matchFilter, key, filterBy[key]);
+    //       }
+    //     }
+
+    //     if(useSortBy){
+    //       for(let i = 0; i < sortBy.length; i++){
+    //         if(sortBy[i].dir === 'desc'){
+    //           this.undebounced_sort_action(undefined, sortBy[i].col)
+    //           this.undebounced_sort_action(undefined, sortBy[i].col)
+    //         }
+    //         else{
+    //           this.undebounced_sort_action(undefined, sortBy[i].col)
+    //         }
+    //       }
+    //     }
+    //   })
     // }
   },
   updated() {
@@ -396,6 +430,28 @@ export default {
     }
   },
   methods: {
+    update_export_display_options(type, updateObject){
+      this.output_display_options[type] = updateObject;
+      console.log(`%cexport display_options: %c${btoa(JSON.stringify(this.output_display_options, stringify_regex))}`, "color: green;", "background: green; color: white;")
+    },
+    change_sort(sorting){
+      for(let i = 0; i < sorting.length; i++){
+        if(sorting[i].dir === 'desc'){
+          this.undebounced_sort_action(undefined, sorting[i].col)
+          this.undebounced_sort_action(undefined, sorting[i].col)
+        }
+        else{
+          this.undebounced_sort_action(undefined, sorting[i].col)
+        }
+      }
+    },
+    change_filter(filters){
+      for(let key in filters){
+        console.log(`---- setting filter ${key} to /${filters[key].source}/`)
+        this.$set(this.options.filters.options.filter_inputs, key, filters[key].source);
+        this.$set(this.options.filters.options.matchFilter, key, filters[key]);
+      }
+    },
     change_to_page(page){
       this.paginationState.current_page = page;
       this.$refs.prot_table.scrollTop = 0;
@@ -444,6 +500,7 @@ export default {
         this.set_url_parameter('filterBy', 
           filterByParam
         )
+        this.update_export_display_options('filterBy', filterByParam)
         // console.log(JSON.stringify(filterByParam, (key, value) => (value instanceof RegExp ? '/' + value.source + '/' + value.flags : value)))
       
       } catch (err) {
@@ -467,7 +524,6 @@ export default {
     },
     undebounced_sort_action(e, sort_key){
       try {
-        console.log(e)
         this.sort_data(sort_key, this.get_sortability[sort_key], e === undefined ? false : true);
       } catch (err) {
         console.error(err);
@@ -519,16 +575,20 @@ export default {
       // }
       console.log([].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey))
       console.log([].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir))
-      if (this.table_options.routing && routeUrl)
-        this.set_url_parameter(
-          "sortBy",
-          [].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey)
+      if (this.table_options.routing && routeUrl){
+        let sortArray = [].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey)
             .slice(-2)
             .map((val, ind) => ({
               col: val,
               dir: [].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir).slice(-2)[ind]
-            }))
+            }));
+        this.set_url_parameter(
+          "sortBy",
+          sortArray
         );
+        this.update_export_display_options('sortBy', sortArray);
+        // this.output_display_options.sortBy = sortArray;
+      }
       if (typeof sort_type !== "function") {
         this.sorted_data.data = this.sorted_data.data
           .slice()
@@ -580,21 +640,7 @@ export default {
               cur.split("=")[0] === param ? cur.split("=")[1] : col,
             ""
           ));
-        result.value = JSON.parse(atob(value), (key, val) => {
-          if(typeof val === 'string'){
-            console.log({key: key, val: val})
-            let matches = val.match(/\/(.*)\/(.*)/);
-            console.log(matches);
-            if (matches)
-              return new RegExp(matches[1], matches[2]);
-            else 
-              return val;  
-          }
-          else{
-            return val;
-          }
-
-        });
+        result.value = JSON.parse(atob(value), parse_regex);
       } catch (e) {
         result.notFound = true;
         console.error(e)
@@ -615,27 +661,23 @@ export default {
       
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
+      
+      let display = JSON.parse(atob(this.display_options), parse_regex);
+
       let sortBy = this.get_url_parameter('sortBy');
       console.log(sortBy)
       if(!sortBy.notFound){
-        for(let i = 0; i < sortBy.value.length; i++){
-          if(sortBy.value[i].dir === 'desc'){
-            this.undebounced_sort_action(undefined, sortBy.value[i].col)
-            this.undebounced_sort_action(undefined, sortBy.value[i].col)
-          }
-          else{
-            this.undebounced_sort_action(undefined, sortBy.value[i].col)
-          }
-        }
+        this.change_sort(sortBy.value);
+      }
+      else{
+        this.change_sort(display.sortBy);
       }
       let filterBy = this.get_url_parameter('filterBy');
       if(!filterBy.notFound){
-        let filters = filterBy.value;
-        for(let key in filters){
-          console.log(`---- setting filter ${key} to /${filters[key].source}/`)
-          this.$set(this.options.filters.options.filter_inputs, key, filters[key].source);
-          this.$set(this.options.filters.options.matchFilter, key, filters[key]);
-        }
+        this.change_filter(filterBy.value);
+      }
+      else{
+        this.change_filter(display.filterBy);
       }
     },
     options: function(newValue) {

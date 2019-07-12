@@ -1,6 +1,6 @@
 <template>
   <div id="protapp" ref="app">
-    <prot-vue-table :table_data="table_data" :options="options"></prot-vue-table>
+    <prot-vue-table :table_data="table_data" :options="options" :display_options="display_options"></prot-vue-table>
   </div>
 </template>
 
@@ -136,6 +136,7 @@ export default {
      * 
     */
     table_options: [Object, String],
+    display_options: String,
 
   },
   methods: {
