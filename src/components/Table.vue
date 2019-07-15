@@ -292,8 +292,10 @@ export default {
         let data = this.sorted_data.data || this.original_table_data;
         let filter_applied = data
         try{
+          console.time('filter')
           filter_applied = filter.apply(data, this.table_options.filters);
           this.datalength = filter_applied.length;
+          console.timeEnd('filter')
         }
         catch(err){
           console.error(err)
@@ -301,7 +303,9 @@ export default {
         
         let formatter_applied = filter_applied;
         try{
+          console.time('formatter')
           formatter_applied = formatter.apply(filter_applied, this.table_options.formatter, this.get_header_list) ;
+          console.timeEnd('formatter')
         }
         catch(err){
           console.error(err)
@@ -310,7 +314,9 @@ export default {
         let paginated = formatter_applied;
         try{
           // this.set_page_total();
+          console.time('pagination_filter')
           paginated = pagination.apply(formatter_applied, this.table_options.pagination, this.paginationState.current_page, this.paginationState.total_pages);
+          console.timeEnd('pagination_filter')
         }
         catch(err){
           console.error(err)
@@ -412,7 +418,8 @@ export default {
           return !this.table_options.dontShowCols.includes(value); //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
         }),
         display: display_names,
-        widths: fixed_widths
+        widths: fixed_widths,
+        all: header_fields
       };
       console.log({ result: result });
 
@@ -661,25 +668,40 @@ export default {
       
       Vue.set(this.sorted_data, "data", newValue);
       console.log('---- data changed')
-      console.log('JSON in: ', atob(this.display_options))
-      let display = JSON.parse(atob(this.display_options), parse_regex);
+      // console.log('JSON in: ', this.display_options ? atob(this.display_options) : '')
+      let display = this.display_options ? JSON.parse(atob(this.display_options), parse_regex) : {};
 
-      let sortBy = this.get_url_parameter('sortBy');
-      console.log(sortBy)
-      if(!sortBy.notFound){
-        this.change_sort(sortBy.value);
+      try{
+        let sortBy = this.get_url_parameter('sortBy');
+
+        console.log(sortBy)
+        if(!sortBy.notFound){
+          this.change_sort(sortBy.value);
+        }
+        else{
+          if(display && display.sortBy)
+            this.change_sort(display.sortBy);
+        }
       }
-      else{
-        if(display.sortBy)
-          this.change_sort(display.sortBy);
+      catch(e){
+        console.error('Sort error')
+        console.error(e)
       }
-      let filterBy = this.get_url_parameter('filterBy');
-      if(!filterBy.notFound){
-        this.change_filter(filterBy.value);
+
+      try{
+        let filterBy = this.get_url_parameter('filterBy');
+      
+        if(!filterBy.notFound){
+          this.change_filter(filterBy.value);
+        }
+        else{
+          if(display && display.filterBy)
+            this.change_filter(display.filterBy);
+        }
       }
-      else{
-        if(display.filterBy)
-          this.change_filter(display.filterBy);
+      catch(e){
+        console.error('Filter error')
+        console.error(e)
       }
     },
     options: function(newValue) {
