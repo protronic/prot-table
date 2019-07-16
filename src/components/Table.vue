@@ -68,13 +68,15 @@
           ], 
           table_options.rowStyles.map( value => (value.check_row(display_table_data[j], j) ? value.styles : {}))
         )"
+          @click="close_dropdown()"
           v-html="row[col]"
         ></div>
         <div :key="'row_details' + j + '_col' + i" :ref="'detail'" :class="['details_field']"></div>
       </template>
     </template>
-    <div id="footer" ref="footer" @click="logCurrent">
+    <div id="footer" ref="footer">
       <div class="totalCount">Zeilen: {{ datalength }}, Zeilen pro Seite: {{ table_options.pagination.options.rows }}</div>
+      <col-selector ref="column_dropdown" :all_columns="get_header_list.all" :table_height="clientHeight" @column_show_toggle="column_visibility_change"></col-selector>
       <div class="stopper"></div>
       <div class="firstPage pageEnd" v-show="(get_total_pages() > 1)" @click="change_to_page(0)">&lt;&lt;</div>
       <div class="previousPage pageSelect" v-show="(get_total_pages() > 1)" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
@@ -94,8 +96,10 @@ import { setTimeout } from 'timers';
 import formatter from './formatter.js';
 import pagination from './pagination.js';
 import filter from './filter.js';
+import colSelector from './colSelector.vue'
 
-console.log({filter, formatter, pagination})
+
+// console.log({filter, formatter, pagination})
 
 function stringify_regex(key, value){
   // console.log(`Key: ${key}; Value: ${value};`)
@@ -108,9 +112,9 @@ function stringify_regex(key, value){
 
 function parse_regex(key, val){
   if(typeof val === 'string'){
-    console.log({key: key, val: val})
+    // console.log({key: key, val: val})
     let matches = val.match(/\/(.*)\/(.*)/);
-    console.log(matches);
+    // console.log(matches);
     if (matches)
       return new RegExp(matches[1], matches[2]);
     else 
@@ -127,13 +131,18 @@ function parse_regex(key, val){
 
 export default {
   name: "protVueTable",
+  components:{
+    colSelector
+  },
   created() {
     for (let i in []) {
       //this.dont_schow.push(i);
+      
     }
   },
   data: function() {
     return {
+      clientHeight: 0,
       datalength: 0,
       table_options: {
         height: "auto",
@@ -281,11 +290,16 @@ export default {
         else{
           this.paginationState.total_pages = 0;
         }
+
+        this.clientHeight = this.$refs.prot_table.clientHeight;
       }
       this.table_options = this.options;
     });
   },
   computed: {
+    get_client_height(){
+      return this.$refs.prot_table ? this.$refs.prot_table.clientHeight : 0;
+    },
     display_table_data(){
       console.log({sorted: this.sorted_data.data, original: this.original_table_data, options: this.table_options, pageination: this.paginationState})
       if ((this.sorted_data.data || this.original_table_data) && this.table_options) {
@@ -412,16 +426,25 @@ export default {
           // this.debug.push({display_names: display_names})
         }
       }
+      let hideColumns = this.get_url_parameter('hideColumns', false);
+      let display = this.display_options ? JSON.parse(atob(this.display_options), parse_regex) : {};
+      if(!display.hideColumns || !hideColumns.notFound) display.hideColumns = [];
+      console.log('hidecolumns', hideColumns.value, 'type: ', typeof hideColumns.value)
+      if(hideColumns.value)
+        this.$set(this.table_options, 'dontShowCols', hideColumns.value);
+      else
+        this.$set(this.table_options, 'dontShowCols', display.hideColumns);
       const result = {
         keys: header_fields.filter(value => {
           // this.debug.push(value);
-          return !this.table_options.dontShowCols.includes(value); //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
+          return !this.table_options.dontShowCols.includes(value) && !display.hideColumns.includes(value) && !hideColumns.value.includes(value); //&& typeof value !== 'function'//|| !this.dont_schow.includes(value);
         }),
         display: display_names,
         widths: fixed_widths,
-        all: header_fields
+        all: header_fields,
+        hidden: hideColumns.value,
       };
-      console.log({ result: result });
+      console.log({ header_result: result });
 
       if (this.table_options.showTimers) console.timeEnd("calc_header_time");
       return result;
@@ -437,8 +460,44 @@ export default {
     }
   },
   methods: {
-    update_export_display_options(type, updateObject){
-      this.output_display_options[type] = updateObject;
+    // update_export_display_options(type, updateObject){
+    //   this.output_display_options[type] = updateObject;
+    //   console.log(`%cexport display_options: %c${btoa(JSON.stringify(this.output_display_options, stringify_regex))}`, "color: green;", "background: green; color: white;")
+    // },
+    close_dropdown(){
+      if(this.$refs.column_dropdown.show)
+        this.$refs.column_dropdown.show = false;
+    },
+    update_export_display_options(routeUrl){
+      let filterByParam = {};
+      for(let key in this.table_options.filters.options.matchFilter){
+        if(this.table_options.filters.options.matchFilter[key]) filterByParam[key] = this.table_options.filters.options.matchFilter[key]
+      }        
+      let sortArray = [].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey)
+        .slice(-2)
+        .map((val, ind) => ({
+          col: val,
+          dir: [].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir).slice(-2)[ind]
+      }));
+      if (this.table_options.routing && routeUrl !== false){
+        this.set_url_parameter(
+          "sortBy",
+          sortArray
+        );
+        this.set_url_parameter(
+          'filterBy', 
+          filterByParam
+        );
+        this.set_url_parameter(
+          'hideColumns', 
+          this.table_options.dontShowCols || []
+        );
+        // this.update_export_display_options('sortBy', sortArray);
+        // this.output_display_options.sortBy = sortArray;
+      }
+      this.output_display_options['sortBy'] = sortArray;
+      this.output_display_options['filterBy'] = filterByParam;
+      this.output_display_options['hideColumns'] = this.table_options.dontShowCols;
       console.log(`%cexport display_options: %c${btoa(JSON.stringify(this.output_display_options, stringify_regex))}`, "color: green;", "background: green; color: white;")
     },
     change_sort(sorting){
@@ -470,7 +529,7 @@ export default {
       return Math.min(this.paginationState.total_pages, this.paginationState.current_page);
     },
     set_page_total(){
-      console.log(this.paginationState.total_pages, Math.ceil(this.datalength / this.table_options.pagination.options.rows))
+      // console.log(this.paginationState.total_pages, Math.ceil(this.datalength / this.table_options.pagination.options.rows))
       if(this.paginationState.total_pages != Math.ceil(this.datalength / this.table_options.pagination.options.rows)){
         this.paginationState.total_pages = Math.ceil(this.datalength / this.table_options.pagination.options.rows);
         this.paginationState.current_page = Math.min(this.paginationState.current_page, this.paginationState.total_pages);
@@ -500,14 +559,8 @@ export default {
             ? new RegExp(value, "gim")
             : value
         );
-        let filterByParam = {};
-        for(let key in this.table_options.filters.options.matchFilter){
-          if(this.table_options.filters.options.matchFilter[key]) filterByParam[key] = this.table_options.filters.options.matchFilter[key]
-        }
-        this.set_url_parameter('filterBy', 
-          filterByParam
-        )
-        this.update_export_display_options('filterBy', filterByParam)
+        
+        this.update_export_display_options(true)
         // console.log(JSON.stringify(filterByParam, (key, value) => (value instanceof RegExp ? '/' + value.source + '/' + value.flags : value)))
       
       } catch (err) {
@@ -580,22 +633,9 @@ export default {
       //   this.sorted_data.previousSorts = this.sorted_data.previousSorts.slice(0, -1);
       //   this.sorted_data.previousSort_dirs = this.sorted_data.previousSort_dirs.slice(0, -2).concat(this.sorted_data.previousSort_dirs.slice(-1)[0])
       // }
-      console.log([].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey))
-      console.log([].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir))
-      if (this.table_options.routing && routeUrl){
-        let sortArray = [].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey)
-            .slice(-2)
-            .map((val, ind) => ({
-              col: val,
-              dir: [].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir).slice(-2)[ind]
-            }));
-        this.set_url_parameter(
-          "sortBy",
-          sortArray
-        );
-        this.update_export_display_options('sortBy', sortArray);
-        // this.output_display_options.sortBy = sortArray;
-      }
+      // console.log([].concat(...this.sorted_data.previousSorts, this.sorted_data.currentSortKey))
+      // console.log([].concat(...this.sorted_data.previousSort_dirs, this.sorted_data.currentSortDir))
+      this.update_export_display_options(routeUrl)
       if (typeof sort_type !== "function") {
         this.sorted_data.data = this.sorted_data.data
           .slice()
@@ -632,7 +672,7 @@ export default {
 
       history.pushState(null, "", encodeURI(resultURI));
     },
-    get_url_parameter(param) {
+    get_url_parameter(param, showError) {
       let result = { key: param, value: "" };
       let url = location.href;
 
@@ -650,13 +690,28 @@ export default {
         result.value = JSON.parse(atob(value), parse_regex);
       } catch (e) {
         result.notFound = true;
-        console.error(e)
+        if(showError) console.error(`parameter ${param} wurde im Link nicht gefunden.`)
       }
 
       return result;
     },
     logCurrent(){
       console.log(this.paginationState.current_page)
+    },
+    column_visibility_change(column, change){
+      // console.log('table', column, change)
+      if(change && this.table_options.dontShowCols !== undefined && this.table_options.dontShowCols.includes(column)){
+        this.table_options.dontShowCols = this.table_options.dontShowCols.filter((key) => (key !== column));
+      }
+      else if(!change){
+        console.log(this.table_options.dontShowCols)
+        this.table_options.dontShowCols.push(column);
+      }
+      this.update_export_display_options(true)
+    },
+    change_hidden_columns(hideColumns){
+      this.$refs.column_dropdown.unchecked_columns = hideColumns;
+      // this.$set(this.table_options, 'dontShowCols', hideColumns);
     }
   },
   watch: {
@@ -672,9 +727,9 @@ export default {
       let display = this.display_options ? JSON.parse(atob(this.display_options), parse_regex) : {};
 
       try{
-        let sortBy = this.get_url_parameter('sortBy');
+        let sortBy = this.get_url_parameter('sortBy', true);
 
-        console.log(sortBy)
+        // console.log(sortBy)
         if(!sortBy.notFound){
           this.change_sort(sortBy.value);
         }
@@ -689,7 +744,7 @@ export default {
       }
 
       try{
-        let filterBy = this.get_url_parameter('filterBy');
+        let filterBy = this.get_url_parameter('filterBy', true);
       
         if(!filterBy.notFound){
           this.change_filter(filterBy.value);
@@ -702,6 +757,23 @@ export default {
       catch(e){
         console.error('Filter error')
         console.error(e)
+      }
+
+      try{
+        let hideColumns = this.get_url_parameter('hideColumns', true);
+        // console.log('hideCols: ', hideColumns)
+        if(!hideColumns.notFound){
+            this.change_hidden_columns(hideColumns.value);           
+          // this.table_options.dontShowCols = hideColumns.value;
+        }
+        else{
+          if(display && display.hideColumns)
+            this.change_hidden_columns(display.hideColumns);
+        }
+      }
+      catch(e){
+        console.error('hidden Columns Error')
+        console.error(e);
       }
     },
     options: function(newValue) {
@@ -862,7 +934,7 @@ export default {
 
 .totalCount {
   height: 1em;
-  width: 100%;
+  width: 50%;
   text-align: left;
   margin-top: auto;
   margin-bottom: auto;
