@@ -1,9 +1,11 @@
 <template>
   <div class="dropdown">
     <button @click="toggle()" class="dropbtn">Spalten</button>
-    <ul ref="dropdown" v-show="show" class="dropdown-content" :style="[{top: get_height}]">
-      <li v-for="(item, i) in all_columns" :key="item"><input type="checkbox" :checked="!unchecked_columns.includes(item)" :value="item" @change="value_changed(item, $event)" class="dropdown-chkbox"> {{ item }}</li>
-    </ul>
+    <div class="parent">
+      <ul ref="dropdown" v-show="show" :class="['dropdown-content', get_class]" :style="{'max-height': '900px', 'white-space': 'nowrap', 'display': 'block'}">
+        <li v-for="(item, i) in all_columns" :key="item"><input type="checkbox" :checked="!unchecked_columns.includes(item)" :value="item" @change="value_changed(item, $event)" class="dropdown-chkbox"> {{ item }}</li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ export default {
     return {
       show: true,
       dropdown_height: 0,
+      top_offset: 0,
       unchecked_columns: [],
       initial_show: true,
     };
@@ -29,20 +32,26 @@ export default {
     // show_dropdown: Boolean,
   },
   computed: {
+    get_class(){
+      return this.table_height - this.dropdown_height < 15 ? 
+        'down' :
+        'up';
+    },
     get_height(){
-      if(this.table_height && this.dropdown_height){
-        return `calc(${
-          this.table_height - this.dropdown_height < 50 ? 
-            this.table_height : 
-            this.table_height - this.dropdown_height
-        }px ${
-          this.table_height - this.dropdown_height < 50 ? 
-            '+ 0em' : 
-            '- 2em'
-        })`
-      }
-      else
-        return `${0}px`;
+      // :style="[{top: get_height}]"
+      // if(this.table_height && this.dropdown_height){
+      //   return `calc(${
+      //     this.table_height - this.dropdown_height < 50 ? 
+      //     this.top_offset + this.table_height : 
+      //     this.top_offset + this.table_height - this.dropdown_height
+      //   }px ${
+      //     this.table_height - this.dropdown_height < 50 ? 
+      //       '+ 0em' : 
+      //       '- 2em'
+      //   })`
+      // }
+      // else
+      //   return `${0}px`;
     },
   },
   methods:{
@@ -67,7 +76,9 @@ export default {
     //   // });
     // },
     table_height: function(newValue){
-      this.dropdown_height = document.querySelector('.dropdown-content').clientHeight;
+      let d = document.querySelector('.dropdown-content')
+      this.dropdown_height = d.clientHeight < this.dropdown_height ? this.dropdown_height : d.clientHeight;
+      this.top_offset = d.offsetTop;
       // this.show = false;
       if(this.initial_show) {
         setTimeout(()=> (this.show = false, this.initial_show = false), 0)
@@ -132,18 +143,35 @@ export default {
     overflow: visible;
   }
 
+  .dropdown-content.up {
+    bottom: -1em;
+  }
+
+  .dropdown-content.down {
+    top: 0.5em;
+  }
+
+  .parent {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    overflow: visible;
+  }
+
   .dropdown-content {
     display: block;
-    position: fixed;
+    position: absolute;
+    /* width: calc(100% + 2em); */
     border-radius: 10px;
     background-color: #f1f1f1;
     border: 1px solid gray;
     box-shadow: 4px 0px 16px 4px rgba(0,0,0,0.2);
-    /* z-index: 1; */
+    z-index: 100;
     list-style: none;
     /* bottom: var(--table-height); */
     text-align: left;
     padding: 5px;
+    /* overflow: visible; */
   }
 
   .dropdown-chkbox {
