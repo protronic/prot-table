@@ -76,7 +76,7 @@
     </template>
     <div id="footer" ref="footer">
       <div class="totalCount">Zeilen: {{ datalength }}, Zeilen pro Seite: {{ table_options.pagination.options.rows }}</div>
-      <col-selector ref="column_dropdown" :all_columns="get_header_list.all" :table_height="clientHeight" @column_show_toggle="column_visibility_change"></col-selector>
+      <col-selector ref="column_dropdown" :all_columns="get_header_list.all" :table_height="clientHeight" @column_show_toggle="column_visibility_change" @reset_url="reset_url()"></col-selector>
       <div class="stopper"></div>
       <div class="firstPage pageEnd" v-show="(get_total_pages() > 1)" @click="change_to_page(0)">&lt;&lt;</div>
       <div class="previousPage pageSelect" v-show="(get_total_pages() > 1)" @click="change_to_page(Math.max(get_current_page() - 1, 0))">&lt;</div>
@@ -712,6 +712,11 @@ export default {
     change_hidden_columns(hideColumns){
       this.$refs.column_dropdown.unchecked_columns = hideColumns;
       // this.$set(this.table_options, 'dontShowCols', hideColumns);
+    },
+    reset_url(){
+      let url = decodeURI(location.href);
+      let result = url.split('?')[0] + '?' +  url.split('?')[1].split('&').filter( pair => {let variable = pair.split('=')[0]; if ( variable === 'sortBy' || variable === 'filterBy' || variable === 'hideColumns') return false; else return true }).join('&')
+      location.href = encodeURI(result);
     }
   },
   watch: {
@@ -934,16 +939,17 @@ export default {
 
 .totalCount {
   height: 1em;
-  width: 50%;
+  width: 30%;
   text-align: left;
   margin-top: auto;
   margin-bottom: auto;
   vertical-align: middle;
+  margin-right: 30%;
 }
 
 .stopper {
   height: 1em;
-  width: 50%;
+  width: 40%;
 }
 
 .arrow {

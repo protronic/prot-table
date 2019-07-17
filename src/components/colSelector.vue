@@ -1,6 +1,9 @@
 <template>
   <div class="dropdown">
-    <button @click="toggle()" class="dropbtn">Spalten</button>
+    <div class="btns">
+      <button @click="toggle()" class="dropbtn">Spalten</button>
+      <button @click="reset_url()" class="rstbtn">Link Reset</button>
+    </div>
     <div class="parent">
       <ul ref="dropdown" v-show="show" :class="['dropdown-content', get_class]" :style="{'max-height': '900px', 'white-space': 'nowrap', 'display': 'block'}">
         <li v-for="item in all_columns" :key="item"><input type="checkbox" :checked="!unchecked_columns.includes(item)" :value="item" @change="value_changed(item, $event)" class="dropdown-chkbox"> {{ item }}</li>
@@ -47,6 +50,9 @@ export default {
       event.stopPropagation();
       console.log(col_changed, event.target.checked);
       this.$emit('column_show_toggle', col_changed, event.target.checked);
+    },
+    reset_url(){
+      this.$emit('reset_url');
     }
   },
   watch: {
@@ -83,7 +89,8 @@ export default {
     overflow-y: visible;
   }
 
-  .dropbtn {
+  .dropdown button {
+    position: absolute;
     -moz-box-shadow:inset 0px 1px 0px 0px #94989c;
     -webkit-box-shadow:inset 0px 1px 0px 0px #94989c;
     box-shadow:inset 0px 1px 0px 0px #94989c;
@@ -99,18 +106,32 @@ export default {
     -webkit-border-radius:6px;
     border-radius:6px;
     border:  1px solid grey;
-    display:inline-block;
+    /* display:inline-block; */
     cursor:pointer;
 	  color:#5c5c5c;
     margin-left: 50px;
     /* padding:6px 24px; */
     text-decoration:none;
     text-shadow:0px 1px 0px #696e73;
-    height: 100%;
     vertical-align: middle;
+    height: 90%;
+    margin-top: auto;
+    margin-bottom: auto;
   }
-  
-  .dropbtn:hover {
+
+  .dropbtn {
+    top: 1px;
+    left: 0px;
+    width: 100px;
+  }
+
+  .rstbtn {
+    top:1px;
+    left: 105px;
+    width: 100px;
+  }
+
+  .dropdown button:hover {
     background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #878787));
     background:-moz-linear-gradient(top, #cccccc 5%, #878787 100%);
     background:-webkit-linear-gradient(top, #cccccc 5%, #878787 100%);
@@ -121,14 +142,18 @@ export default {
     background-color:#cccccc;
   }
 
-  .dropbtn:active {
-    position:relative;
-    top:1px;
+  .dropdown button:active {
+    position: absolute;
+    top:0px;
+  }
+
+  .btns {
+
   }
 
   .dropdown {
     position: relative;
-    display: inline-block;
+    display: block;
     overflow: visible;
   }
 
