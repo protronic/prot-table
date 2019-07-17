@@ -3,15 +3,13 @@
     <button @click="toggle()" class="dropbtn">Spalten</button>
     <div class="parent">
       <ul ref="dropdown" v-show="show" :class="['dropdown-content', get_class]" :style="{'max-height': '900px', 'white-space': 'nowrap', 'display': 'block'}">
-        <li v-for="(item, i) in all_columns" :key="item"><input type="checkbox" :checked="!unchecked_columns.includes(item)" :value="item" @change="value_changed(item, $event)" class="dropdown-chkbox"> {{ item }}</li>
+        <li v-for="item in all_columns" :key="item"><input type="checkbox" :checked="!unchecked_columns.includes(item)" :value="item" @change="value_changed(item, $event)" class="dropdown-chkbox"> {{ item }}</li>
       </ul>
     </div>
   </div>
 </template>
 
 <script>
-import { timeout } from 'q';
-import { setTimeout } from 'timers';
 export default {
   name: 'col-selector',
   mounted(){
@@ -37,22 +35,6 @@ export default {
         'down' :
         'up';
     },
-    get_height(){
-      // :style="[{top: get_height}]"
-      // if(this.table_height && this.dropdown_height){
-      //   return `calc(${
-      //     this.table_height - this.dropdown_height < 50 ? 
-      //     this.top_offset + this.table_height : 
-      //     this.top_offset + this.table_height - this.dropdown_height
-      //   }px ${
-      //     this.table_height - this.dropdown_height < 50 ? 
-      //       '+ 0em' : 
-      //       '- 2em'
-      //   })`
-      // }
-      // else
-      //   return `${0}px`;
-    },
   },
   methods:{
     toggle(){
@@ -76,12 +58,19 @@ export default {
     //   // });
     // },
     table_height: function(newValue){
-      let d = document.querySelector('.dropdown-content')
+      // if(!this.isMounted) return;
+      // let d = //document.querySelector('.dropdown-content')
+      let d = this.$refs.dropdown;
       this.dropdown_height = d.clientHeight < this.dropdown_height ? this.dropdown_height : d.clientHeight;
       this.top_offset = d.offsetTop;
       // this.show = false;
       if(this.initial_show) {
-        setTimeout(()=> (this.show = false, this.initial_show = false), 0)
+        // setTimeout(()=> {
+        this.$nextTick(() => {
+          this.show = false;
+          this.initial_show = false;
+        })
+        // }, 0)
       }
     }
   }
