@@ -4,7 +4,7 @@
     ref="prot_table"
     :style="[
       update_column_sizes, {
-        'grid-template-rows': 'repeat(' + (display_table_data.length + 1) + ', auto)', 
+        'grid-template-rows': 'repeat(' + (display_table_data.length + 4) + ', auto)', 
         'max-height': typeof table_options.height === 'number' ? table_options.height + 'px' : table_options.height,
         'overflow-y': table_options.height === 'auto' || table_options.height === undefined ? 'auto' : 'scroll',
       }, 
@@ -282,7 +282,7 @@ export default {
         this.$set(
           cssVars,
           "--grid-footer-area",
-          `${this.display_table_data.length * 2 + 3} / 1 / ${this.display_table_data.length * 2 + 3} / ${this.get_header_list.keys.length + 1}`
+          `${this.display_table_data.length * 2 + 4} / 1 / ${this.display_table_data.length * 2 + 4} / ${this.get_header_list.keys.length + 1}`
         );
         if(this.table_options.pagination.active){
           this.paginationState.total_pages = Math.ceil(this.original_table_data.length / this.table_options.pagination.options.rows)

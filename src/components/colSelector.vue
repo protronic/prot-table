@@ -112,7 +112,7 @@ export default {
     margin-left: 50px;
     /* padding:6px 24px; */
     text-decoration:none;
-    text-shadow:0px 1px 0px #696e73;
+    /* text-shadow:0px 1px 0px #696e73; */
     vertical-align: middle;
     height: 90%;
     margin-top: auto;
